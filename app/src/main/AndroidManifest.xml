@@ -16,7 +16,7 @@
             android:name=".SecondActivity"
             android:exported="true" />
         <activity
-            android:name=".FirstActivity"
+            android:name=".fzy.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
