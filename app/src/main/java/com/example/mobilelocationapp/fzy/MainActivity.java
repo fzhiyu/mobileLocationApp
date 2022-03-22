@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
     float textWidth = 3f;
     float textSize = 40;
     float pointWidth = 8f;
+    TextView txtSecond, txtThird, txtFourth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
         radioGroup = findViewById(R.id.radioGroup);
         btnChange = findViewById(R.id.btn_change);
         btnFirstToSecond = findViewById(R.id.btn_first_to_second);
+        txtSecond = findViewById(R.id.second);
+        txtThird = findViewById(R.id.third);
+        txtFourth = findViewById(R.id.fourth);
 
         //获取view的长宽
         linearLayout = findViewById(R.id.linearlayout);
@@ -134,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         //设置输入法不自动弹出
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        //清空记录
         text1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,6 +150,11 @@ public class MainActivity extends AppCompatActivity {
                     paint.setTextSize(textSize);
                     my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
                 }
+                txtSecond.setText("");
+                txtThird.setText("");
+                txtFourth.setText("");
+                edt3.setText("");
+                edt4.setText("");
                 hits = 0;
                 cars.clear();
             }
@@ -182,7 +192,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private void changeAxis(Car car) {
+        //检测输入是否合法
+        try{
+            changeAxis2(car);
+        }catch (NumberFormatException ex) {
+            Toast.makeText(getApplicationContext(), "输入内容不合法，请重新输入", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void changeAxis2(Car car) {
+        float length = Float.parseFloat(edt3.getText().toString());
+        float radius = Float.parseFloat(edt4.getText().toString());
+        float X = (float)(length * Math.cos(Math.toRadians(radius)) + circleX);
+        float Y = (float) (length * Math.sin(Math.toRadians(radius)) + circleY);
+
+        //擦粗原有点
         paint.setStrokeWidth(pointWidth);
         paint.setColor(Color.WHITE);
         my_canvas.drawPoint(car.getX(), car.getY(), paint);
@@ -190,18 +217,23 @@ public class MainActivity extends AppCompatActivity {
         paint.setTextSize(textSize);
         my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
 
-        float length = Float.parseFloat(edt3.getText().toString());
-        float radius = Float.parseFloat(edt4.getText().toString());
-        float X = (float)(length * Math.cos(Math.toRadians(radius)) + circleX);
-        float Y = (float) (length * Math.sin(Math.toRadians(radius)) + circleY);
-
         cars.remove(car);
-//        edt1.setText(df.format(X - circleX));
-//        edt2.setText(df.format(-(Y - circleY)));
-
         String radio = car.getCheckedRadio();
         Car car1 = new Car(X, Y, length, radius, radio);
         cars.add(car1);
+        switch (radio) {
+            case "二":
+                txtSecond.setText("长度:" + df.format(length) + ",角度:" + df.format(radius));
+                break;
+            case "三":
+                txtThird.setText("长度:" + df.format(length) + ",角度:" + df.format(radius));
+                break;
+            case "四":
+                txtFourth.setText("长度:" + df.format(length) + ",角度:" + df.format(radius));
+                break;
+            default:
+                break;
+        }
 
         paint.setStrokeWidth(pointWidth);
         paint.setColor(Color.BLACK);
@@ -363,6 +395,20 @@ public class MainActivity extends AppCompatActivity {
 //            edt2.setText(df.format(-showY));
             edt3.setText(df.format(lengthPoint));
             edt4.setText(df.format(radiusPoint));
+            switch (selectedName) {
+                case "二":
+                    txtSecond.setText("长度:" + df.format(lengthPoint) + ",角度:" + df.format(radiusPoint));
+                    break;
+                case "三":
+                    txtThird.setText("长度:" + df.format(lengthPoint) + ",角度:" + df.format(radiusPoint));
+                    break;
+                case "四":
+                    txtFourth.setText("长度:" + df.format(lengthPoint) + ",角度:" + df.format(radiusPoint));
+                    break;
+                default:
+                    break;
+            }
+
             //添加新的坐标
             cars.add(new Car(paintX, paintY, lengthPoint, radiusPoint, selectedName));
             System.out.println(cars.toString());
@@ -377,4 +423,5 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "请选择后点击", Toast.LENGTH_SHORT).show();
         }
     }
+
 }
