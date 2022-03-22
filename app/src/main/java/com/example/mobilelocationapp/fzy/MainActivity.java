@@ -176,12 +176,15 @@ public class MainActivity extends AppCompatActivity {
         paint.setTextSize(textSize);
         my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
 
-        cars.remove(car);
-
-        float X = Float.parseFloat(edt1.getText().toString()) + circleX;
-        float Y = -Float.parseFloat(edt2.getText().toString()) + circleY;
         float length = Float.parseFloat(edt3.getText().toString());
         float radius = Float.parseFloat(edt4.getText().toString());
+        float X = (float)(length * Math.cos(Math.toRadians(radius)) + circleX);
+        float Y = (float) (length * Math.sin(Math.toRadians(radius)) + circleY);
+
+        cars.remove(car);
+        edt1.setText(df.format(X - circleX));
+        edt2.setText(df.format(-(Y - circleY)));
+
         String radio = car.getCheckedRadio();
         Car car1 = new Car(X, Y, length, radius, radio);
         cars.add(car1);
@@ -310,14 +313,14 @@ public class MainActivity extends AppCompatActivity {
         showY = paintY - circleY;
         //获取点的长度角度显示
         lengthPoint = Math.sqrt(showX * showX + showY * showY);
-//        if (showX < 0) {
-//            radiusPoint = 180 - Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
-//        } else if (showX > 0 && showY < 0) {
-//            radiusPoint = 360 + Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
-//        } else {
-//            radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
-//        }
-        radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+//        radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+        if (showX < 0) {
+            radiusPoint = 180 - Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+        } else if (showY < 0) {
+            radiusPoint = 360 + Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+        } else {
+            radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+        }
 
         //获取选框的字符
         selectedId = radioGroup.getCheckedRadioButtonId();
