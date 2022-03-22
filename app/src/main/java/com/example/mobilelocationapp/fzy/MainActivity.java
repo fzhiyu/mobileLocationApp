@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "main";
     MyDrawView myDrawView;
-    EditText edt1;
-    EditText edt2;
+//    EditText edt1;
+//    EditText edt2;
     EditText edt3;
     EditText edt4;
     RadioButton radio1, radio2, radio3, radio4;
@@ -107,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.addView(myDrawView);
 
         //获取edittext、button、textview、checkbox对象
-        edt1 = findViewById(R.id.edt1);
-        edt2 = findViewById(R.id.edt2);
+//        edt1 = findViewById(R.id.edt1);
+//        edt2 = findViewById(R.id.edt2);
         edt3 = findViewById(R.id.edt3);
         edt4 = findViewById(R.id.edt4);
         text1 = findViewById(R.id.text1);
@@ -196,8 +196,8 @@ public class MainActivity extends AppCompatActivity {
         float Y = (float) (length * Math.sin(Math.toRadians(radius)) + circleY);
 
         cars.remove(car);
-        edt1.setText(df.format(X - circleX));
-        edt2.setText(df.format(-(Y - circleY)));
+//        edt1.setText(df.format(X - circleX));
+//        edt2.setText(df.format(-(Y - circleY)));
 
         String radio = car.getCheckedRadio();
         Car car1 = new Car(X, Y, length, radius, radio);
@@ -359,8 +359,8 @@ public class MainActivity extends AppCompatActivity {
             paint.setStrokeWidth(textWidth);
             paint.setTextSize(textSize);
             my_canvas.drawText(selectedName, paintX + 10, paintY + 10, paint);
-            edt1.setText(df.format(showX));
-            edt2.setText(df.format(-showY));
+//            edt1.setText(df.format(showX));
+//            edt2.setText(df.format(-showY));
             edt3.setText(df.format(lengthPoint));
             edt4.setText(df.format(radiusPoint));
             //添加新的坐标
