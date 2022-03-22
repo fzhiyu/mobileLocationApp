@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/radioGroup"
-            android:text="清空点击"
+            android:text="点击清空"
             android:textSize="25sp" />
 
         <TextView
@@ -137,6 +137,14 @@
             android:layout_toEndOf="@+id/radius"
             android:hint="Point on Radius"
             android:gravity="center"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_change"
+            android:text="修改点坐标"
+            android:layout_below="@+id/radius"
+            android:layout_marginTop="40dp"/>
     </RelativeLayout>
 
     <LinearLayout
@@ -145,12 +153,5 @@
         android:layout_height="fill_parent"
         android:layout_toEndOf="@+id/linearlayout1"
         android:orientation="vertical" />
-
-<!--    <com.example.mobilelocationapp.fzy.MyDrawView-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"/>-->
-<!--    <view class="com.example.mobilelocationapp.fzy.MainActivity$MyDrawView"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"/>-->
 
 </RelativeLayout>

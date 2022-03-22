@@ -10,9 +10,13 @@ import android.graphics.Path;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -27,6 +31,7 @@ import com.example.mobilelocationapp.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +46,16 @@ public class MainActivity extends AppCompatActivity {
     EditText edt4;
     RadioButton radio1, radio2, radio3, radio4;
     RadioGroup radioGroup;
+    Button btnChange;
     //声明画笔
     private Canvas my_canvas;
     Paint paint;
     //屏幕宽高
     int screenWidth;
     int screenHeight;
+    //view的宽高
+    int ViewWidth;
+    int ViewHeight;
     //位图宽高
     int bitmapWidth;
     int bitmapHeight;
@@ -69,11 +78,6 @@ public class MainActivity extends AppCompatActivity {
     //以长度角度为要素显示点坐标
     double lengthPoint;
     double radiusPoint;
-    //设置小车对象,用于储存坐标
-    Car car1;
-    Car car2;
-    Car car3;
-    Car car4;
     //记录点击次数
     int hits = 0;
     TextView text1;
@@ -84,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
     DecimalFormat df = new DecimalFormat("#.##");
     String selectedName;
     boolean checkedFlag = false;
+    int selectedId;
+    float textWidth = 3f;
+    float textSize = 40;
+    float pointWidth = 8f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +114,18 @@ public class MainActivity extends AppCompatActivity {
         radio3 = findViewById(R.id.radio3);
         radio4 = findViewById(R.id.radio4);
         radioGroup = findViewById(R.id.radioGroup);
+        btnChange = findViewById(R.id.btn_change);
+
+        //获取view的长宽
+        linearLayout = findViewById(R.id.linearlayout);
+        ViewTreeObserver observer = linearLayout.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                ViewHeight = linearLayout.getHeight();
+                ViewWidth = linearLayout.getWidth();
+            }
+        });
 
         //设置输入法不自动弹出
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -114,14 +134,73 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 for (Car car : cars) {
-                    paint.setStrokeWidth(8f);
+                    paint.setStrokeWidth(pointWidth);
                     paint.setColor(Color.WHITE);
                     my_canvas.drawPoint(car.getX(), car.getY(), paint);
+                    paint.setStrokeWidth(textWidth);
+                    paint.setTextSize(textSize);
+                    my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
                 }
                 hits = 0;
                 cars.clear();
             }
         });
+
+        //修改点的坐标
+        btnChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectedId = radioGroup.getCheckedRadioButtonId();
+                selectedButton = findViewById(selectedId);
+                //检查是否有选项选择
+                if (selectedId != -1) {
+                    selectedName = (String) selectedButton.getText();
+                    Car car = checkRadio();
+                    Log.e(TAG, "onClick: " + cars.toString() );
+                    Log.e(TAG, "onClick: " + car );
+                    //检查被选择项是否已有坐标
+                    if (checkRadio() != null) {
+                        //如果有坐标则更改
+                        changeAxis(car);
+                    }
+                }
+            }
+        });
+    }
+
+    private void changeAxis(Car car) {
+        paint.setStrokeWidth(pointWidth);
+        paint.setColor(Color.WHITE);
+        my_canvas.drawPoint(car.getX(), car.getY(), paint);
+        paint.setStrokeWidth(textWidth);
+        paint.setTextSize(textSize);
+        my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
+
+        cars.remove(car);
+
+        float X = Float.parseFloat(edt1.getText().toString()) + circleX;
+        float Y = -Float.parseFloat(edt2.getText().toString()) + circleY;
+        float length = Float.parseFloat(edt3.getText().toString());
+        float radius = Float.parseFloat(edt4.getText().toString());
+        String radio = car.getCheckedRadio();
+        Car car1 = new Car(X, Y, length, radius, radio);
+        cars.add(car1);
+
+        paint.setStrokeWidth(pointWidth);
+        paint.setColor(Color.BLACK);
+        my_canvas.drawPoint(car1.getX(), car1.getY(), paint);
+        paint.setStrokeWidth(textWidth);
+        paint.setTextSize(textSize);
+        my_canvas.drawText(car1.getCheckedRadio(), car1.getX() + 10,car1.getY() + 10, paint);
+    }
+
+    private Car checkRadio() {
+        for (Car car : cars) {
+            if (car.getCheckedRadio().equals(selectedName)) {
+                return car;
+            }
+        }
+        return null;
     }
 
     public class MyDrawView extends View {
@@ -137,14 +216,6 @@ public class MainActivity extends AppCompatActivity {
             //about how to draw geometries, text and bitmaps.
             paint = new Paint();
             path = new Path();
-            //设置抗锯齿
-            paint.setAntiAlias(true);
-            paint.setColor(Color.RED);
-            //设置粗线连接点
-            paint.setStrokeJoin(Paint.Join.ROUND);
-
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(5f);
 
             //获取屏幕长宽
             DisplayMetrics metrics = new DisplayMetrics();   //for all android versions
@@ -153,13 +224,13 @@ public class MainActivity extends AppCompatActivity {
             screenHeight = metrics.heightPixels;
 
             //设置位图宽高
-            bitmapWidth = 1500;
+            bitmapWidth = screenWidth;
             bitmapHeight = screenHeight;
 
             //设置位图的宽高
             bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.RGB_565);
             //设置位图颜色
-            bitmap.eraseColor(Color.GRAY);
+            bitmap.eraseColor(Color.WHITE);
             my_canvas = new Canvas(bitmap);
         }
 
@@ -168,36 +239,35 @@ public class MainActivity extends AppCompatActivity {
             super.onDraw(canvas);
 
             //位图的左上角坐标
-            bitmapX = screenWidth - linearLayout.getLeft() - bitmapWidth;
+            bitmapX = screenWidth - linearLayout.getLeft() - ViewWidth;
             bitmapY = 0;
             //圆心的坐标
-            circleX = bitmapX + bitmapWidth / 2;
-            circleY = 800;
+            circleX = bitmapX + ViewWidth / 2;
+            circleY = ViewHeight/2;
             //圆半径
-            radius = 600;
+            radius = 450;
 
             //设置直线的起始点
-            float lineStartX = circleX - 600;
-            float lineEndX = circleX + 600;
-
+            float lineStartX = circleX - radius;
+            float lineEndX = circleX + radius;
 
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawBitmap(bitmap, bitmapX, bitmapY, paint);
             paint.setColor(Color.BLACK);
             paint.setStrokeWidth(2f);
-            canvas.drawCircle(circleX, circleY, 10, paint);
-            canvas.drawCircle(circleX, circleY, 100, paint);
-            canvas.drawCircle(circleX, circleY, 200, paint);
-            canvas.drawCircle(circleX, circleY, 300, paint);
-            canvas.drawCircle(circleX, circleY, 400, paint);
-            canvas.drawCircle(circleX, circleY, 500, paint);
-            canvas.drawCircle(circleX, circleY, 600, paint);
+            canvas.drawCircle(circleX, circleY, 3, paint);
+            canvas.drawCircle(circleX, circleY, 50, paint);
+            canvas.drawCircle(circleX, circleY, 150, paint);
+            canvas.drawCircle(circleX, circleY, 250, paint);
+            canvas.drawCircle(circleX, circleY, 350, paint);
+            canvas.drawCircle(circleX, circleY, 450, paint);
 
             canvas.drawLine(lineStartX, circleY, lineEndX, circleY, paint);
-            float lineStartY = circleY - 600;
-            float lineEndY = circleY + 600;
+            float lineStartY = circleY - radius;
+            float lineEndY = circleY + radius;
             canvas.drawLine(circleX, lineStartY, circleX, lineEndY, paint);
 
+            paint.setStyle(Paint.Style.FILL_AND_STROKE);
         }
 
         @SuppressLint("SetTextI18n")
@@ -233,23 +303,24 @@ public class MainActivity extends AppCompatActivity {
     private void drawPoint() {
 
         //计算触摸点到圆心距离
-        float paintToCenter = (paintX - bitmapWidth / 2) * (paintX - bitmapWidth / 2) +
+        float paintToCenter = (paintX - circleX) * (paintX - circleX) +
                 (paintY - circleY) * (paintY - circleY);
         //以圆心为原点更改坐标系, 更改显示坐标点
-        showX = paintX - bitmapWidth / 2;
+        showX = paintX - circleX;
         showY = paintY - circleY;
         //获取点的长度角度显示
         lengthPoint = Math.sqrt(showX * showX + showY * showY);
-        if (showX < 0) {
-            radiusPoint = 180 - Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
-        } else if (showX > 0 && showY < 0) {
-            radiusPoint = 360 + Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
-        } else {
-            radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
-        }
+//        if (showX < 0) {
+//            radiusPoint = 180 - Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+//        } else if (showX > 0 && showY < 0) {
+//            radiusPoint = 360 + Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+//        } else {
+//            radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
+//        }
+        radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
 
         //获取选框的字符
-        int selectedId = radioGroup.getCheckedRadioButtonId();
+        selectedId = radioGroup.getCheckedRadioButtonId();
         selectedButton = findViewById(selectedId);
         if (selectedId != -1) {
             selectedName = (String) selectedButton.getText();
@@ -266,14 +337,17 @@ public class MainActivity extends AppCompatActivity {
         //限制在圆内画点
         if (paintToCenter < radius * radius && hits < 4 && !checkedFlag && selectedId != -1) {
             paint.setColor(Color.BLACK);
-            paint.setStrokeWidth(8f);
-            my_canvas.drawPoint(paintX, yPos, paint);
+            paint.setStrokeWidth(pointWidth);
+            my_canvas.drawPoint(paintX, paintY, paint);
+            paint.setStrokeWidth(textWidth);
+            paint.setTextSize(textSize);
+            my_canvas.drawText(selectedName, paintX + 10, paintY + 10, paint);
             edt1.setText(df.format(showX));
             edt2.setText(df.format(-showY));
             edt3.setText(df.format(lengthPoint));
             edt4.setText(df.format(radiusPoint));
             //添加新的坐标
-            cars.add(new Car(paintX, yPos, lengthPoint, radiusPoint, selectedName));
+            cars.add(new Car(paintX, paintY, lengthPoint, radiusPoint, selectedName));
             System.out.println(cars.toString());
             hits = hits + 1;
         } else if (paintToCenter > radius * radius) {
@@ -281,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (hits >= 4) {
             Toast.makeText(getApplicationContext(), "超过最大点击次数", Toast.LENGTH_SHORT).show();
         } else if (checkedFlag) {
-            Toast.makeText(getApplicationContext(), "不能重复选择，请取消后重点", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "不能重复选择", Toast.LENGTH_SHORT).show();
         } else if (selectedId == -1) {
             Toast.makeText(getApplicationContext(), "请选择后点击", Toast.LENGTH_SHORT).show();
         }
