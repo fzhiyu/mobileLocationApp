@@ -2,6 +2,7 @@ package com.example.mobilelocationapp.fzy;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mobilelocationapp.R;
+import com.example.mobilelocationapp.SecondActivity;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     RadioButton radio1, radio2, radio3, radio4;
     RadioGroup radioGroup;
     Button btnChange;
+    private Button btnFirstToSecond;//首页到第二页的按钮
     //声明画笔
     private Canvas my_canvas;
     Paint paint;
@@ -115,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         radio4 = findViewById(R.id.radio4);
         radioGroup = findViewById(R.id.radioGroup);
         btnChange = findViewById(R.id.btn_change);
+        btnFirstToSecond = findViewById(R.id.btn_first_to_second);
 
         //获取view的长宽
         linearLayout = findViewById(R.id.linearlayout);
@@ -164,6 +168,16 @@ public class MainActivity extends AppCompatActivity {
                         changeAxis(car);
                     }
                 }
+            }
+        });
+
+        btnFirstToSecond.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                //传输数据给第二页
+                intent.putExtra("something",1);
+                startActivity(intent);
             }
         });
     }

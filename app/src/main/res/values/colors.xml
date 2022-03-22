@@ -9,4 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorRectangle">#455A64</color>
     <color name="colorBackground">#FFFFD600</color>
+
+    //
+    <color name="blue">#4A7484</color>
+    <color name="gray">#EDEDED</color>
 </resources>

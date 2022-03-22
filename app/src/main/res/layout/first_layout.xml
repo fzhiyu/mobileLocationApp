@@ -145,6 +145,13 @@
             android:text="修改点坐标"
             android:layout_below="@+id/radius"
             android:layout_marginTop="40dp"/>
+
+        <Button
+            android:id="@+id/btn_first_to_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下一页"
+            android:layout_below="@+id/btn_change"/>
     </RelativeLayout>
 
     <LinearLayout
