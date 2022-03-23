@@ -3,6 +3,7 @@ package com.example.mobilelocationapp.fzy;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -111,6 +112,9 @@ public class MainActivity extends AppCompatActivity{
         //获取布局文件里的linearlayout容器
         linearLayout = findViewById(R.id.linearlayout);
         linearLayout.addView(myDrawView);
+
+        //控制平板横向
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         //获取edittext、button、textview、checkbox对象
 //        edt1 = findViewById(R.id.edt1);
