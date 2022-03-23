@@ -201,14 +201,15 @@
                         android:layout_centerInParent="true"
                         android:background="@drawable/round_button"
                         android:text="STOP" />
+
                     <ImageButton
                         android:id="@+id/ibtn_up"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_up"
-                        android:background="@color/white"
                         android:layout_above="@id/btn_stop"
-                        android:layout_centerHorizontal="true"/>
+                        android:layout_centerHorizontal="true"
+                        android:background="@color/white"
+                        app:srcCompat="@drawable/ic_up" />
                     <ImageButton
                         android:id="@+id/ibtn_down"
                         android:layout_width="wrap_content"
