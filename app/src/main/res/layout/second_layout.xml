@@ -269,16 +269,28 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="@color/gray"/>
+<!--    <View-->
+<!--        android:layout_width="1dp"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:background="@color/gray"/>-->
 
     <!--    图示-->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/rLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+            <com.example.mobilelocationapp.CanvasView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+
 
     </LinearLayout>
 

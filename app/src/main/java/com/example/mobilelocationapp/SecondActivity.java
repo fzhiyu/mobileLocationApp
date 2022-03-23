@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.mobilelocationapp.chart.ChartService;
@@ -32,11 +34,20 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
     private ChartService XService, YService;
     private Timer timer;
 
+    private RelativeLayout rLayout;
+    private CarErrorView carErrorView;
+
+    private float[] carsDistance;//小车的距离
+    private float[] carsAngle;//小车的角度
+    private int carsNumber;//小车的数量
+
     private Button offOnSystem, stopEmergency;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //隐藏标题栏
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.second_layout);
 
         //设置横屏
@@ -45,15 +56,24 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         //设置输入法不自动弹出
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        //按钮点击
         offOnSystem = findViewById(R.id.btn_off_on_system);
         stopEmergency = findViewById(R.id.btn_stop_emergency);
 
         offOnSystem.setOnClickListener(this);
         stopEmergency.setOnClickListener(this);
 
+        //布局
         lLayout_X_Error = findViewById(R.id.llayout_X_error);
         lLayout_Y_Error = findViewById(R.id.llayout_Y_error);
+        rLayout = findViewById(R.id.rLayout);
 
+        carsDistance = new float[]{250, 250, 250, 250};
+        carsAngle = new float[]{45, 135, 225, 315};
+        carErrorView = new CarErrorView(this, null, carsDistance, carsAngle);
+        rLayout.addView(carErrorView);
+
+        //误差曲线
         XService = new ChartService(this);
         XService.setMultipleSeriesDataset("X轴实时误差");
         XService.setMultipleSeriesRenderer(100, 100, "x轴实时误差", "时间", "误差",
@@ -66,11 +86,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 Color.RED, Color.RED, Color.RED, Color.BLACK);
         YView = YService.getGraphicalView();
 
-        //将左右图表添加到布局容器中
-//        lLayout_X_Error.addView(XView, new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-//        lLayout_Y_Error.addView(YView, new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         lLayout_X_Error.addView(XView);
         lLayout_Y_Error.addView(YView);
 
