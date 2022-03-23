@@ -157,6 +157,7 @@ public class MainActivity extends AppCompatActivity{
                     my_canvas.drawPoint(car.getX(), car.getY(), paint);
                     paint.setStrokeWidth(textWidth);
                     paint.setTextSize(textSize);
+                    paint.setStyle(Paint.Style.FILL_AND_STROKE);
                     my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
                 }
                 txtSecond.setText("");
@@ -251,6 +252,7 @@ public class MainActivity extends AppCompatActivity{
         my_canvas.drawPoint(car.getX(), car.getY(), paint);
         paint.setStrokeWidth(textWidth);
         paint.setTextSize(textSize);
+        paint.setStyle(Paint.Style.FILL);
         my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
 
         cars.remove(car);
@@ -362,7 +364,7 @@ public class MainActivity extends AppCompatActivity{
             //画一
             canvas.drawText("一", circleX + 10, circleY + 10, paint);
 
-            paint.setStyle(Paint.Style.FILL_AND_STROKE);
+            paint.setStyle(Paint.Style.FILL);
         }
 
         @SuppressLint("SetTextI18n")
@@ -436,6 +438,7 @@ public class MainActivity extends AppCompatActivity{
             my_canvas.drawPoint(paintX, paintY, paint);
             paint.setStrokeWidth(textWidth);
             paint.setTextSize(textSize);
+            paint.setStyle(Paint.Style.FILL);
             my_canvas.drawText(selectedName, paintX + 10, paintY + 10, paint);
 //            edt1.setText(df.format(showX));
 //            edt2.setText(df.format(-showY));
