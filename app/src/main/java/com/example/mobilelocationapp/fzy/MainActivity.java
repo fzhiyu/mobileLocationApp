@@ -14,7 +14,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -33,12 +32,11 @@ import com.example.mobilelocationapp.SecondActivity;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private static final String TAG = "main";
     MyDrawView myDrawView;
@@ -96,6 +94,13 @@ public class MainActivity extends AppCompatActivity {
     float textSize = 40;
     float pointWidth = 8f;
     TextView txtSecond, txtThird, txtFourth;
+    //比例换算参数
+    double pro = 4.5;
+    //修改的参数
+    float changeLength;
+    float changeRadius;
+    float changeX;
+    float changeY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 //        edt2 = findViewById(R.id.edt2);
         edt3 = findViewById(R.id.edt3);
         edt4 = findViewById(R.id.edt4);
-        text1 = findViewById(R.id.text1);
+        text1 = findViewById(R.id.textClear);
         radio1 = findViewById(R.id.radio1);
         radio2 = findViewById(R.id.radio2);
         radio3 = findViewById(R.id.radio3);
@@ -190,13 +195,44 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+                selectedButton = findViewById(checkedId);
+                //检查是否有选项选择
+                if (selectedId != -1) {
+                    selectedName = (String) selectedButton.getText();
+                    Car car = checkRadio();
+                    //检查被选择项是否已有坐标
+                    if (car != null && checkRadio() != null) {
+                        //如果有坐标则更改
+                        edt3.setText(df.format(car.getLength()));
+                        edt4.setText(df.format(car.getRadius()));
+                    }
+                }
+            }
+        });
+
     }
+
+
 
     @SuppressLint("SetTextI18n")
     private void changeAxis(Car car) {
         //检测输入是否合法
         try{
-            changeAxis2(car);
+            changeLength = Float.parseFloat(edt3.getText().toString());
+            changeRadius = Float.parseFloat(edt4.getText().toString());
+            if (changeLength < pro && changeRadius < 360) {
+                changeX = (float)(changeLength * Math.cos(Math.toRadians(changeRadius)) * radius / pro + circleX);
+                changeY = (float) (changeLength * Math.sin(Math.toRadians(changeRadius)) * radius / pro + circleY);
+                changeAxis2(car);
+            } else if (changeLength > pro) {
+                Toast.makeText(getApplicationContext(), "超过最大输入长度", Toast.LENGTH_SHORT).show();
+            } else if (changeRadius > 360) {
+                Toast.makeText(getApplicationContext(), "超过最大输入角度", Toast.LENGTH_SHORT).show();
+            }
         }catch (NumberFormatException ex) {
             Toast.makeText(getApplicationContext(), "输入内容不合法，请重新输入", Toast.LENGTH_SHORT).show();
         }
@@ -204,10 +240,6 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void changeAxis2(Car car) {
-        float length = Float.parseFloat(edt3.getText().toString());
-        float radius = Float.parseFloat(edt4.getText().toString());
-        float X = (float)(length * Math.cos(Math.toRadians(radius)) + circleX);
-        float Y = (float) (length * Math.sin(Math.toRadians(radius)) + circleY);
 
         //擦粗原有点
         paint.setStrokeWidth(pointWidth);
@@ -219,17 +251,17 @@ public class MainActivity extends AppCompatActivity {
 
         cars.remove(car);
         String radio = car.getCheckedRadio();
-        Car car1 = new Car(X, Y, length, radius, radio);
+        Car car1 = new Car(changeX, changeY, changeLength, changeRadius, radio);
         cars.add(car1);
         switch (radio) {
             case "二":
-                txtSecond.setText("长度:" + df.format(length) + ",角度:" + df.format(radius));
+                txtSecond.setText("长度:" + df.format(changeLength) + ",角度:" + df.format(changeRadius));
                 break;
             case "三":
-                txtThird.setText("长度:" + df.format(length) + ",角度:" + df.format(radius));
+                txtThird.setText("长度:" + df.format(changeLength) + ",角度:" + df.format(changeRadius));
                 break;
             case "四":
-                txtFourth.setText("长度:" + df.format(length) + ",角度:" + df.format(radius));
+                txtFourth.setText("长度:" + df.format(changeLength) + ",角度:" + df.format(changeRadius));
                 break;
             default:
                 break;
@@ -291,30 +323,38 @@ public class MainActivity extends AppCompatActivity {
             bitmapX = screenWidth - linearLayout.getLeft() - ViewWidth;
             bitmapY = 0;
             //圆心的坐标
-            circleX = bitmapX + ViewWidth / 2;
-            circleY = ViewHeight/2;
+            circleX = bitmapX + (float) ViewWidth / 2;
+            circleY = (float) ViewHeight/2;
             //圆半径
             radius = 450;
 
             //设置直线的起始点
             float lineStartX = circleX - radius;
             float lineEndX = circleX + radius;
+            //设置解释文字点
+            float textProportion;
 
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawBitmap(bitmap, bitmapX, bitmapY, paint);
             paint.setColor(Color.BLACK);
             paint.setStrokeWidth(2f);
+            paint.setAntiAlias(true);
+            //画圆图
             canvas.drawCircle(circleX, circleY, 3, paint);
             canvas.drawCircle(circleX, circleY, 50, paint);
             canvas.drawCircle(circleX, circleY, 150, paint);
             canvas.drawCircle(circleX, circleY, 250, paint);
             canvas.drawCircle(circleX, circleY, 350, paint);
             canvas.drawCircle(circleX, circleY, 450, paint);
-
+            //画直线
             canvas.drawLine(lineStartX, circleY, lineEndX, circleY, paint);
             float lineStartY = circleY - radius;
             float lineEndY = circleY + radius;
             canvas.drawLine(circleX, lineStartY, circleX, lineEndY, paint);
+            //画比例尺
+            paint.setTextSize(textSize);
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawText("1:1米", ViewWidth - 300, 100, paint);
 
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
         }
@@ -358,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
         showX = paintX - circleX;
         showY = paintY - circleY;
         //获取点的长度角度显示
-        lengthPoint = Math.sqrt(showX * showX + showY * showY);
+        lengthPoint = Math.sqrt(showX * showX + showY * showY) / radius * pro;
 //        radiusPoint = Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
         if (showX < 0) {
             radiusPoint = 180 - Math.asin(showY / Math.sqrt(paintToCenter)) * 180 / Math.PI;
