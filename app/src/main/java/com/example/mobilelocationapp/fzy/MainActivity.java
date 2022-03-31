@@ -221,8 +221,6 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
-
-
     @SuppressLint("SetTextI18n")
     private void changeAxis(Car car) {
         //检测输入是否合法
@@ -362,7 +360,7 @@ public class MainActivity extends AppCompatActivity{
             paint.setStyle(Paint.Style.FILL);
             canvas.drawText("1:1米", ViewWidth - 300, 100, paint);
             //画一
-            canvas.drawText("一", circleX + 10, circleY + 10, paint);
+            canvas.drawText("主", circleX + 10, circleY + 10, paint);
 
             paint.setStyle(Paint.Style.FILL);
         }
