@@ -2,29 +2,41 @@ package com.example.mobilelocationapp.serviceTest;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import com.example.mobilelocationapp.R;
 
 public class MainActivity extends AppCompatActivity {
     MyConn myConn;
     MyService.MyBinder myBinder;
+    EditText edtReceiveMessage;
+    StringBuffer stringBuffer = new StringBuffer();
+    MyBroadcast myBroadcast = new MyBroadcast();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service);
 
+        edtReceiveMessage = findViewById(R.id.edt_ReceiveMessage);
+        IntentFilter intentFilter = new IntentFilter(TCPServer.RECEIVE_ACTION);
+        registerReceiver(myBroadcast, intentFilter);
     }
+
     //跳转到子页面
     public  void tochild(View v){
         Log.v("chendandan","to child page");
         Intent intent=new Intent(MainActivity.this,MainActivity2.class);
+
         startActivity(intent);
     }
     //绑定服务
@@ -41,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     public void callClick(View view){
         Log.v("chendandan","callClick()");
         myBinder.methodInBinder();
+
     }
     //解除绑定
     public void unbindClick(View view){
@@ -60,6 +73,24 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.v("chendandan","服务成功解绑");
+        }
+    }
+
+    private class MyBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String mAction = intent.getAction();
+            assert mAction != null;
+            /**接收來自UDP回傳之訊息*/
+            switch (mAction) {
+                case TCPServer.RECEIVE_ACTION:
+                    String msg = intent.getStringExtra(TCPServer.RECEIVE_STRING);
+                    byte[] bytes = intent.getByteArrayExtra(TCPServer.RECEIVE_BYTES);
+                    stringBuffer.append("收到： ").append(msg).append("\n");
+                    edtReceiveMessage.setText(stringBuffer);
+                    break;
+
+            }
         }
     }
 }

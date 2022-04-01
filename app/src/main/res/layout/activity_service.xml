@@ -29,4 +29,11 @@
         android:onClick="tochild"
         android:text="to child"/>
 
+    <EditText
+        android:id="@+id/edt_ReceiveMessage"
+        android:minLines="20"
+        android:inputType="textMultiLine"
+        android:focusableInTouchMode="false"
+        android:focusable="false"/>
+
 </TableLayout>

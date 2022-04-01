@@ -1,4 +1,6 @@
 package com.example.mobilelocationapp.serviceTest;
+import static android.content.ContentValues.TAG;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -6,9 +8,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class MyService extends Service {
 
     int count = 0;
+    int port = 8888;
+    TCPServer tcpServer;
 
     class MyBinder extends Binder{
         public void methodInBinder(){
@@ -21,7 +32,12 @@ public class MyService extends Service {
         Log.v("chendandan","执行MyService中的method()方法");
         count++;
         Log.e("de", "method: " + count );
+        tcpServer = new TCPServer(port, this);
+        ExecutorService exec = Executors.newCachedThreadPool();
+        exec.execute(tcpServer);
     }
+
+
 
     @Override
     public void onCreate(){
@@ -36,7 +52,7 @@ public class MyService extends Service {
     }
     @Override
     public boolean onUnbind(Intent intent){
-        Log.v("chendandan","解绑服务，执行onUnbind()方法");
+        tcpServer.closeServer();
         return super.onUnbind(intent);
     }
     @Override
