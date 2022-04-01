@@ -2,9 +2,11 @@ package com.example.mobilelocationapp.fzy;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -21,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -61,6 +64,9 @@ public class MainActivity2 extends AppCompatActivity {
     Boolean myBound = false;
     Button btn_send, btn_create, nextPage;
     TextView txtIP;
+    EditText edtShow;
+    StringBuffer stringBuffer = new StringBuffer();
+    MyBroadcast myBroadcast = new MyBroadcast();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,6 +83,7 @@ public class MainActivity2 extends AppCompatActivity {
         btn_create = findViewById(R.id.btn_create);
         nextPage = findViewById(R.id.nextPage);
         txtIP = findViewById(R.id.ip2);
+        edtShow = findViewById(R.id.edt_ReceiveMessage);
 
         //显示IP地址
         txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
@@ -93,6 +100,9 @@ public class MainActivity2 extends AppCompatActivity {
                 ViewWidth = linearLayout.getWidth();
             }
         });
+
+        IntentFilter intentFilter = new IntentFilter(TCPServer.RECEIVE_ACTION);
+        registerReceiver(myBroadcast, intentFilter);
 
         //绑定服务
         Intent intent = new Intent(MainActivity2.this, MyService.class);
@@ -144,6 +154,20 @@ public class MainActivity2 extends AppCompatActivity {
             myBound = false;
         }
     };
+
+    private class MyBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String mAction = intent.getAction();
+            assert mAction != null;
+            if (TCPServer.RECEIVE_ACTION.equals(mAction)) {
+                String msg = intent.getStringExtra(TCPServer.RECEIVE_STRING);
+                byte[] bytes = intent.getByteArrayExtra(TCPServer.RECEIVE_BYTES);
+                stringBuffer.append("收到： ").append(msg).append("\n");
+                edtShow.setText(stringBuffer);
+            }
+        }
+    }
 
 
     public class MyDrawView extends View {
