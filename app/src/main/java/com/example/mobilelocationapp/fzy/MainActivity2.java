@@ -306,6 +306,12 @@ public class MainActivity2 extends AppCompatActivity {
 
         // Check which radio button was clicked
         switch(view.getId()) {
+            case R.id.radio0:
+                if (checked) {
+                    currRadio = 0;
+                    Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+                }
+                break;
             case R.id.radio1:
                 if (checked) {
                     currRadio = 1;

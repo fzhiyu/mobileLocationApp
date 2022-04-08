@@ -33,22 +33,24 @@
 <!--            android:layout_below="@+id/ip2"-->
 <!--            android:id="@+id/radio1"/>-->
 
-        <RadioButton
-            android:id="@+id/radio0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/selectCar2"
-            android:checked="true"
-            android:text="主"
-            android:textSize="15sp" />
+
 
         <RadioGroup
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/radio0"
             android:layout_below="@+id/selectCar2"
             android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/selectCar2"
+                android:checked="true"
+                android:text="主"
+                android:onClick="onRadioButtonClicked"
+                android:textSize="15sp" />
 
             <RadioButton
                 android:id="@+id/radio1"
@@ -87,14 +89,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/speedTxt1"
-            android:layout_below="@+id/radio0"
+            android:layout_below="@+id/radioGroup"
             android:text="速度："/>
 
         <TextView
             android:id="@+id/speedTxt2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/radio0"
+            android:layout_below="@+id/radioGroup"
             android:layout_toEndOf="@+id/speedTxt1"
             android:text="30 m/s" />
 
@@ -102,7 +104,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/seekBar_speed"
-            android:layout_below="@id/radio0"
+            android:layout_below="@id/radioGroup"
             android:max="100"
             android:progress="30"
             android:layout_toEndOf="@+id/speedTxt2"/>

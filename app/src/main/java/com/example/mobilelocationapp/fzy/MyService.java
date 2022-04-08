@@ -16,6 +16,7 @@ public class MyService extends Service {
     TcpSlaveServer tcpSlaveServer1;
     TcpSlaveServer tcpSlaveServer2;
     TcpSlaveServer tcpSlaveServer3;
+    TcpMasterServer tcpMasterServer;
 
     public class MyBinder extends Binder{
         public MyService getService() {
@@ -48,6 +49,9 @@ public class MyService extends Service {
 
     private void sendMessage(String message, int currRadio) {
         switch (currRadio) {
+            case 0:
+                exec.execute(() -> tcpMasterServer.inputThread.sendData(message));
+                break;
             case 1:
                 exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
                 break;
