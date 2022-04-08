@@ -11,32 +11,39 @@ import java.util.concurrent.Executors;
 
 public class MyService extends Service {
 
-    int port = 8888;
     TCPServer tcpServer;
     ExecutorService exec;
+    TcpSlaveServer tcpSlaveServer1;
 
     public class MyBinder extends Binder{
-        MyService getService() {
+        public MyService getService() {
             return MyService.this;
         }
-        void sendMessageBind(String message) {
+        public void sendMessageBind(String message) {
             sendMessage(message);
         }
-        void createTcpBind() {
+        public void createTcpBind() {
             createTcp();
         }
     }
 
-    public void createTcp(){
+    private void createTcp(){
         Log.v("tag","执行MyService中的createTcp()方法");
-        tcpServer = new TCPServer(port, this);
+//        tcpServer = new TCPServer(port, this);
+//        exec = Executors.newCachedThreadPool();
+//        exec.execute(tcpServer);
+
+        TcpMasterServer tcpMasterServer = new TcpMasterServer(this);
+        tcpSlaveServer1 = new TcpSlaveServer(1102, this);
+        TcpSlaveServer tcpSlaveServer2 = new TcpSlaveServer(1103, this);
         exec = Executors.newCachedThreadPool();
-        exec.execute(tcpServer);
-//        tcpServer.run();
+        exec.execute(tcpMasterServer);
+        exec.execute(tcpSlaveServer1);
+        exec.execute(tcpSlaveServer2);
     }
 
     private void sendMessage(String message) {
-        exec.execute(() -> tcpServer.SST.get(0).sendData(message));
+        exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
     }
 
     @Override

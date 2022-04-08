@@ -1,13 +1,21 @@
 package com.example.mobilelocationapp;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -17,6 +25,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.mobilelocationapp.chart.ChartService;
+import com.example.mobilelocationapp.fzy.MainActivity2;
+import com.example.mobilelocationapp.fzy.MyService;
 
 import org.achartengine.GraphicalView;
 
@@ -43,6 +53,10 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
     private Button offOnSystem, stopEmergency;
 
+    volatile MyService.MyBinder myBinder;
+    MyService myService;
+    Boolean myBound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +69,25 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
         //设置输入法不自动弹出
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        Intent intent = new Intent(SecondActivity.this, MyService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable(){
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                // 在此处添加执行的代码
+                if (myBinder != null) {
+                    myBinder.sendMessageBind("test");
+
+                }
+                Log.e(TAG, "run: handler;");
+                handler.removeCallbacks(this);
+            }
+        };
+        handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
 
         //按钮点击
         offOnSystem = findViewById(R.id.btn_off_on_system);
@@ -105,6 +138,21 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
             XService.updateChart(t, Math.random() * 100);
             YService.updateChart(t, Math.random() * 100);
             t+=5;
+        }
+    };
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            myBinder = (MyService.MyBinder) iBinder;
+            myService = myBinder.getService();
+            myBound = true;
+            Log.e(TAG, "second: 绑定" );
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            myBound = false;
         }
     };
 

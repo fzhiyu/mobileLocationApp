@@ -15,17 +15,19 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -35,9 +37,16 @@ import com.example.mobilelocationapp.R;
 import com.example.mobilelocationapp.SecondActivity;
 import com.example.mobilelocationapp.utils.CommendFun;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity2 extends AppCompatActivity {
     float circleX;
     float circleY;
+    //坐标系位置
+    float paintX;
+    float paintY;
     //圆半径
     int radius;
     //声明画笔
@@ -59,7 +68,7 @@ public class MainActivity2 extends AppCompatActivity {
     float textWidth = 3f;
     float textSize = 40;
     MyDrawView myDrawView;
-    MyService.MyBinder myBinder;
+    volatile MyService.MyBinder myBinder;
     MyService myService;
     Boolean myBound = false;
     Button btn_send, btn_create, nextPage;
@@ -67,9 +76,10 @@ public class MainActivity2 extends AppCompatActivity {
     EditText edtShow;
     StringBuffer stringBuffer = new StringBuffer();
     MyBroadcast myBroadcast = new MyBroadcast();
+    List<Car> cars = new ArrayList<>();
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.new_main_layout);
@@ -101,13 +111,42 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
 
-        IntentFilter intentFilter = new IntentFilter(TCPServer.RECEIVE_ACTION);
-        registerReceiver(myBroadcast, intentFilter);
+        Log.e(TAG, "onCreate: 主页面" );
+        IntentFilter intentFilter1 = new IntentFilter("get1102");
+        IntentFilter intentFilter2 = new IntentFilter("get1103");
+        registerReceiver(myBroadcast, intentFilter1);
+        registerReceiver(myBroadcast, intentFilter2);
 
         //绑定服务
         Intent intent = new Intent(MainActivity2.this, MyService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         Log.e(TAG, "BindService: " + myBinder );
+
+
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable(){
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                // 在此处添加执行的代码
+                if (myBinder != null) {
+                    myBinder.createTcpBind();
+
+                }
+                Log.e(TAG, "run: handler;");
+                handler.removeCallbacks(this);
+            }
+        };
+        handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
+
+        Button btn_test = findViewById(R.id.btn_test);
+        btn_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                my_canvas.drawPoint();
+                myDrawView.drawPoint();
+            }
+        });
 
         //建立连接
         btn_create.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +166,7 @@ public class MainActivity2 extends AppCompatActivity {
                 if (myService.tcpServer != null) {
                     myBinder.sendMessageBind(text);
                 }
+
             }
         });
 
@@ -139,6 +179,7 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
     }
+
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -159,16 +200,36 @@ public class MainActivity2 extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String mAction = intent.getAction();
-            assert mAction != null;
-            if (TCPServer.RECEIVE_ACTION.equals(mAction)) {
-                String msg = intent.getStringExtra(TCPServer.RECEIVE_STRING);
-                byte[] bytes = intent.getByteArrayExtra(TCPServer.RECEIVE_BYTES);
-                stringBuffer.append("收到： ").append(msg).append("\n");
-                edtShow.setText(stringBuffer);
+
+            if (mAction.equals("get1102") || mAction.equals("get1103")) {
+                String message = intent.getStringExtra("V_actual");
+                int port = intent.getIntExtra("port", -1);
+
+                Log.e(TAG, "onReceive: " + port + " " + System.currentTimeMillis());
+                String[] messageData = message.split(" ");
+                //如果相同端口有点则用白点再画一遍
+                Car update_car = new Car();
+                for (Car car : cars) {
+                    if (car.getPort() == port){
+                        update_car = car;
+                        cars.remove(car);
+                        myDrawView.erasePoint(update_car.getX(), update_car.getY());
+                        break;
+                    }
+                }
+
+                paintX = Float.parseFloat(messageData[1]) * 100 + circleX;
+                paintY = Float.parseFloat(messageData[2]) * 100 + circleY;
+                //存储数据，每次画新点之前，将旧点抹去
+                update_car.setX(paintX);
+                update_car.setY(paintY);
+                update_car.setPort(port);
+                cars.add(update_car);
+
+                myDrawView.drawPoint();
             }
         }
     }
-
 
     public class MyDrawView extends View {
 
@@ -199,6 +260,7 @@ public class MainActivity2 extends AppCompatActivity {
             //设置位图颜色
             bitmap.eraseColor(Color.WHITE);
             my_canvas = new Canvas(bitmap);
+
         }
 
         @Override
@@ -250,6 +312,28 @@ public class MainActivity2 extends AppCompatActivity {
             canvas.drawText("主", circleX + 10, circleY + 10, paint);
 
             paint.setStyle(Paint.Style.FILL);
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            invalidate();
+            return true;
+        }
+
+        public void drawPoint() {
+            paint.setStrokeWidth(10f);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.BLACK);
+            my_canvas.drawPoint(paintX, paintY, paint);
+            invalidate();
+        }
+
+        public void erasePoint(float paintX, float paintY) {
+            paint.setStrokeWidth(11f);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            my_canvas.drawPoint(paintX, paintY, paint);
+            invalidate();
         }
     }
 }

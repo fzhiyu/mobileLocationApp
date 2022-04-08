@@ -6,6 +6,31 @@ public class Car {
     private double length;
     private double radius;
     private String checkedRadio;
+    private int port = -1;
+
+    public Car(float x, float y, int port) {
+        this.x = x;
+        this.y = y;
+        this.port = port;
+    }
+
+    public Car(int port) {
+        this.port = port;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public Car(float x, float y, String checkedRadio) {
+        this.x = x;
+        this.y = y;
+        this.checkedRadio = checkedRadio;
+    }
 
     public Car(float x, float y, double length, double radius) {
         this.x = x;

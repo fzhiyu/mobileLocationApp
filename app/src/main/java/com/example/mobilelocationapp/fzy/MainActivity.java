@@ -1,5 +1,7 @@
 package com.example.mobilelocationapp.fzy;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -146,6 +148,19 @@ public class MainActivity extends AppCompatActivity{
 
         //设置输入法不自动弹出
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        Button btn_test = findViewById(R.id.btn_test);
+        btn_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.setColor(Color.BLACK);
+                paint.setStrokeWidth(10f);
+                paint.setTextSize(textSize);
+                paint.setStyle(Paint.Style.FILL_AND_STROKE);
+                my_canvas.drawText("极度", 100, 100, paint);
+                Log.e(TAG, "onClick: 打印" );
+            }
+        });
 
         //清空记录
         text1.setOnClickListener(new View.OnClickListener() {

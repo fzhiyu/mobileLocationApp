@@ -14,10 +14,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileLocationApp">
 
-        <service
-            android:name=".serviceTest.MyService"
-            android:enabled="true"
-            android:exported="true" />
 
         <service android:name=".fzy.MyService"
             android:enabled="true"
