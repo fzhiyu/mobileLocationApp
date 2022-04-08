@@ -22,6 +22,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mobilelocationapp.chart.ChartService;
@@ -53,41 +55,29 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
     private Button offOnSystem, stopEmergency;
 
-    volatile MyService.MyBinder myBinder;
-    MyService myService;
-    Boolean myBound = false;
+    private SeekBar seekBar_up, seekBar_down, seekBar_time;//拖动条
+    private TextView tv_up, tv_down, tv_time;
+
+    private Boolean myBound = false;
+    private MyService myService;//service实例, 可以调用service里的公共方法
+    private ServiceConnection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //隐藏标题栏
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.second_layout);
 
+        Log.e(TAG, "onCreate: " + "two");
         //设置横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         //设置输入法不自动弹出
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        Intent intent = new Intent(SecondActivity.this, MyService.class);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        initView();
 
-        Handler handler = new Handler();
-        Runnable runnable = new Runnable(){
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                // 在此处添加执行的代码
-                if (myBinder != null) {
-                    myBinder.sendMessageBind("test");
-
-                }
-                Log.e(TAG, "run: handler;");
-                handler.removeCallbacks(this);
-            }
-        };
-        handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
+        setSeekBar();
 
         //按钮点击
         offOnSystem = findViewById(R.id.btn_off_on_system);
@@ -129,6 +119,26 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 handler.sendMessage(handler.obtainMessage());
             }
         }, 10, 1000);
+
+
+//        connection = new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//                MyService.LocalBinder myBinder = (MyService.LocalBinder) iBinder;
+//                myService = myBinder.getService();
+//                myBound = true;
+//                //myService.getContext(mContext);//将上下文传递给service
+//                Log.i(TAG, "two: 绑定" );
+//            }
+//            @Override
+//            public void onServiceDisconnected(ComponentName componentName) {
+//                myBound = false;
+//            }
+//        };
+//        //开启并绑定服务
+//        Intent intent = new Intent(SecondActivity.this, MyService.class);
+//        startService(intent);
+//        bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
     private int t = 0;
@@ -141,20 +151,70 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         }
     };
 
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myBinder = (MyService.MyBinder) iBinder;
-            myService = myBinder.getService();
-            myBound = true;
-            Log.e(TAG, "second: 绑定" );
-        }
+    //初始化视图
+    public void initView(){
+        seekBar_up = findViewById(R.id.seekBar_up);
+        seekBar_down = findViewById(R.id.seekBar_down);
+        seekBar_time = findViewById(R.id.seekBar_time);
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            myBound = false;
-        }
-    };
+        tv_up = findViewById(R.id.tv_up);
+        tv_down = findViewById(R.id.tv_down);
+        tv_time = findViewById(R.id.tv_time);
+    }
+
+    //拖动
+    public void setSeekBar(){
+        seekBar_up.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                tv_up.setText(i / 10.0 + " m/s²");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBar_down.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                tv_down.setText(i / 10.0 + " m/s²");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBar_time.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                tv_time.setText(i / 2.0 + " s");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
 
     @Override
     public void onClick(View view) {
@@ -173,5 +233,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG, "onDestroy: " + "two");
     }
 }

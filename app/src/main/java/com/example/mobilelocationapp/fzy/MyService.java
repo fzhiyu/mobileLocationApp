@@ -39,7 +39,7 @@ public class MyService extends Service {
         exec = Executors.newCachedThreadPool();
         exec.execute(tcpMasterServer);
         exec.execute(tcpSlaveServer1);
-        exec.execute(tcpSlaveServer2);
+//        exec.execute(tcpSlaveServer2);
     }
 
     private void sendMessage(String message) {
@@ -59,7 +59,6 @@ public class MyService extends Service {
     @Override
     public boolean onUnbind(Intent intent){
         Log.v("tag","解绑服务，执行onUnbind()方法");
-        tcpServer.closeServer();
         return super.onUnbind(intent);
     }
     @Override
