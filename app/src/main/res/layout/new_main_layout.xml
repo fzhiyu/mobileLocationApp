@@ -20,6 +20,13 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/ip1"
             android:id="@+id/ip2"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectCar2"
+            android:layout_below="@+id/ip1"
+            android:text="请选择一个小车："/>
 <!--        <TextView-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
@@ -30,7 +37,7 @@
             android:id="@+id/radio0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ip1"
+            android:layout_below="@+id/selectCar2"
             android:checked="true"
             android:text="主"
             android:textSize="15sp" />
@@ -40,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/radio0"
-            android:layout_below="@+id/ip1"
+            android:layout_below="@+id/selectCar2"
             android:orientation="horizontal">
 
             <RadioButton
@@ -50,7 +57,9 @@
                 android:checked="false"
                 android:text="从一"
                 android:textSize="15sp"
-                android:onClick="onRadioButtonClicked"/>
+                android:onClick="onRadioButtonClicked"
+                android:enabled="false"
+                android:clickable="false"/>
 
             <RadioButton
                 android:id="@+id/radio2"
@@ -59,6 +68,7 @@
                 android:checked="false"
                 android:text="从二"
                 android:textSize="15sp"
+                android:enabled="false"
                 android:onClick="onRadioButtonClicked"/>
 
             <RadioButton
@@ -67,6 +77,7 @@
                 android:layout_height="wrap_content"
                 android:checked="false"
                 android:text="从三"
+                android:enabled="false"
                 android:textSize="15sp"
                 android:onClick="onRadioButtonClicked"/>
 
@@ -165,15 +176,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="从车一"
+            android:id="@+id/selectCar"
+            android:layout_below="@+id/control"
+            android:text="选择需要编队车辆:"/>
+
+        <TextView
             android:id="@+id/car1"
-            android:layout_below="@id/control"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/selectCar"
+            android:text="从车一" />
 
         <CheckBox
             android:id="@+id/checkbox1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/control"
+            android:layout_below="@id/selectCar"
             android:layout_alignBaseline="@+id/car1"
             android:layout_toEndOf="@+id/car1"
             android:onClick="onCheckboxClicked"/>
@@ -183,13 +201,13 @@
             android:layout_height="wrap_content"
             android:text="从车二"
             android:id="@+id/car2"
-            android:layout_below="@id/control"
+            android:layout_below="@id/selectCar"
             android:layout_toEndOf="@+id/checkbox1"/>
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/control"
+            android:layout_below="@id/selectCar"
             android:id="@+id/checkbox2"
             android:layout_toEndOf="@+id/car2"
             android:layout_alignBaseline="@+id/car2"
@@ -200,12 +218,12 @@
             android:layout_height="wrap_content"
             android:text="从车三"
             android:id="@+id/car3"
-            android:layout_below="@id/control"
+            android:layout_below="@id/selectCar"
             android:layout_toEndOf="@+id/checkbox2"/>
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/control"
+            android:layout_below="@id/selectCar"
             android:id="@+id/checkbox3"
             android:layout_toEndOf="@id/car3"
             android:layout_alignBaseline="@+id/car2"

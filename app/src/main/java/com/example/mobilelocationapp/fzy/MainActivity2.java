@@ -102,6 +102,9 @@ public class MainActivity2 extends AppCompatActivity {
     String TRIGHT  = "TRIGHT 1\r\n";
     //当前选择的radio
     int currRadio = 0;
+    RadioButton radio1;
+    RadioButton radio2;
+    RadioButton radio3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +122,9 @@ public class MainActivity2 extends AppCompatActivity {
         seekBar = findViewById(R.id.seekBar_speed);
         speedTxt = findViewById(R.id.speedTxt2);
         formCar = findViewById(R.id.formCar);
+        radio1 = findViewById(R.id.radio1);
+        radio2 = findViewById(R.id.radio2);
+        radio3 = findViewById(R.id.radio3);
 
         //显示IP地址
         txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
@@ -226,8 +232,11 @@ public class MainActivity2 extends AppCompatActivity {
             case R.id.checkbox1:
                 if (checked) {
                     formCars.addFirst(car1);
+                    radio1.setEnabled(true);
                 } else {
                     formCars.remove(car1);
+                    radio1.setEnabled(false);
+                    radio1.setChecked(false);
                 }
                 convertCar(formCars);
                 break;
@@ -240,7 +249,10 @@ public class MainActivity2 extends AppCompatActivity {
                     } else {
                         formCars.add(car2);
                     }
+                    radio2.setEnabled(true);
                 } else {
+                    radio2.setEnabled(false);
+                    radio2.setChecked(false);
                     formCars.remove(car2);
                 }
                 convertCar(formCars);
@@ -248,8 +260,11 @@ public class MainActivity2 extends AppCompatActivity {
             case R.id.checkbox3:
                 if (checked) {
                     formCars.addLast(car3);
+                    radio3.setEnabled(true);
                 } else {
                     formCars.remove(car3);
+                    radio3.setEnabled(false);
+                    radio3.setChecked(false);
                 }
                 convertCar(formCars);
                 break;
