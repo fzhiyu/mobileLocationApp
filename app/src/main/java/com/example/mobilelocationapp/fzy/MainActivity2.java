@@ -2,6 +2,7 @@ package com.example.mobilelocationapp.fzy;
 
 import static android.content.ContentValues.TAG;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,7 +16,6 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -26,20 +26,26 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSeekBar;
 
 import com.example.mobilelocationapp.R;
 import com.example.mobilelocationapp.SecondActivity;
 import com.example.mobilelocationapp.utils.CommendFun;
 
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity2 extends AppCompatActivity {
     float circleX;
@@ -77,6 +83,25 @@ public class MainActivity2 extends AppCompatActivity {
     StringBuffer stringBuffer = new StringBuffer();
     MyBroadcast myBroadcast = new MyBroadcast();
     List<Car> cars = new ArrayList<>();
+    AppCompatSeekBar seekBar;
+    TextView speedTxt;
+    LinkedList<String> formCars = new LinkedList<>();
+    TextView formCar;
+    Map<Integer, String> carMap = new HashMap<>();
+    String car1 = "  从车一";
+    String car2 = "  从车二";
+    String car3 = "  从车三";
+    String UP = "UP 0.1 0.5\r\n";
+    String DOWN = "DOWN 0.1 1\r\n";
+    String LEFT = "LEFT 0.1 0.1\r\n";
+    String RIGHT = "RIGHT 1 0.5\r\n";
+    String STOP = "STOP 1\r\n";
+    String ROTATEL  = "ROTATEL 1\r\n";
+    String ROTATER  = "ROTATER 1\r\n";
+    String TLEFT  = "TLEFT 1\r\n";
+    String TRIGHT  = "TRIGHT 1\r\n";
+    //当前选择的radio
+    int currRadio = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +114,11 @@ public class MainActivity2 extends AppCompatActivity {
         linearLayout = findViewById(R.id.linearlayout);
         linearLayout.addView(myDrawView);
 
-        btn_send = findViewById(R.id.send);
-        btn_create = findViewById(R.id.btn_create);
         nextPage = findViewById(R.id.nextPage);
         txtIP = findViewById(R.id.ip2);
-        edtShow = findViewById(R.id.edt_ReceiveMessage);
+        seekBar = findViewById(R.id.seekBar_speed);
+        speedTxt = findViewById(R.id.speedTxt2);
+        formCar = findViewById(R.id.formCar);
 
         //显示IP地址
         txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
@@ -114,8 +139,10 @@ public class MainActivity2 extends AppCompatActivity {
         Log.e(TAG, "onCreate: 主页面" );
         IntentFilter intentFilter1 = new IntentFilter("get1102");
         IntentFilter intentFilter2 = new IntentFilter("get1103");
+        IntentFilter intentFilter3 = new IntentFilter("get1104");
         registerReceiver(myBroadcast, intentFilter1);
         registerReceiver(myBroadcast, intentFilter2);
+        registerReceiver(myBroadcast, intentFilter3);
 
         //绑定服务
         Intent intent = new Intent(MainActivity2.this, MyService.class);
@@ -139,43 +166,36 @@ public class MainActivity2 extends AppCompatActivity {
         };
         handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
 
-        Button btn_test = findViewById(R.id.btn_test);
-        btn_test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                my_canvas.drawPoint();
-                myDrawView.drawPoint();
-            }
-        });
-
-        //建立连接
-        btn_create.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (myBinder != null) {
-                    myBinder.createTcpBind();
-                }
-            }
-        });
-
-        //发送数据
-        btn_send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String text = "test";
-                if (myService.tcpServer != null) {
-                    myBinder.sendMessageBind(text);
-                }
-
-            }
-        });
-
         //跳转下一页
         nextPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity2.this, SecondActivity.class);
                 startActivity(intent);
+            }
+        });
+
+
+        //控制速度进度条
+        controlSpeed();
+    }
+
+    private void controlSpeed() {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                speedTxt.setText(i + " m/s");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
     }
@@ -196,12 +216,109 @@ public class MainActivity2 extends AppCompatActivity {
         }
     };
 
+    //设置复选框
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((CheckBox) view).isChecked();
+
+        // Check which checkbox was clicked
+        switch(view.getId()) {
+            case R.id.checkbox1:
+                if (checked) {
+                    formCars.addFirst(car1);
+                } else {
+                    formCars.remove(car1);
+                }
+                convertCar(formCars);
+                break;
+            case R.id.checkbox2:
+                if (checked) {
+                    if (formCars.size() == 2 && formCars.getLast().equals(car3)) {
+                        formCars.add(1, car2);
+                    } else if (formCars.size() == 1 && formCars.get(0).equals(car3)){
+                        formCars.addFirst(car2);
+                    } else {
+                        formCars.add(car2);
+                    }
+                } else {
+                    formCars.remove(car2);
+                }
+                convertCar(formCars);
+                break;
+            case R.id.checkbox3:
+                if (checked) {
+                    formCars.addLast(car3);
+                } else {
+                    formCars.remove(car3);
+                }
+                convertCar(formCars);
+                break;
+            // TODO: Veggie sandwich
+        }
+    }
+
+    private void convertCar(List<String> formCars) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s : formCars) {
+            stringBuilder.append(s);
+        }
+        formCar.setText(stringBuilder);
+    }
+
+    public void sendStop(View view) {
+        myBinder.sendMessageBind("STOP 1\r\n", currRadio);
+    }
+
+    public void sendUp(View view) {
+        myBinder.sendMessageBind("UP 1 2\r\n", currRadio);
+    }
+
+    public void sendDown(View view) {
+        myBinder.sendMessageBind("DOWN 1 2\r\n", currRadio);
+    }
+
+    public void sendLeft(View view) {
+        myBinder.sendMessageBind("LEFT 1 2\r\n", currRadio);
+    }
+
+    public void sendRight(View view) {
+        myBinder.sendMessageBind("RIGHT 1 2\r\n", currRadio);
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radio1:
+                if (checked) {
+                    currRadio = 1;
+                    Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+                }
+                    break;
+            case R.id.radio2:
+                if (checked) {
+                    currRadio = 2;
+                    Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+                }
+                    break;
+            case R.id.radio3:
+                if (checked) {
+                    currRadio = 3;
+                    Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+                }
+                    break;
+        }
+    }
+
+
     private class MyBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String mAction = intent.getAction();
 
-            if (mAction.equals("get1102") || mAction.equals("get1103")) {
+            if (mAction.equals("get1102") || mAction.equals("get1103") || mAction.equals("get1104")) {
                 String message = intent.getStringExtra("V_actual");
                 int port = intent.getIntExtra("port", -1);
 

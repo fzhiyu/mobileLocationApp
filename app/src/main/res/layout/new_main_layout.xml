@@ -27,7 +27,7 @@
 <!--            android:id="@+id/radio1"/>-->
 
         <RadioButton
-            android:id="@+id/radio1"
+            android:id="@+id/radio0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ip1"
@@ -39,67 +39,72 @@
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/radio1"
+            android:layout_toEndOf="@+id/radio0"
             android:layout_below="@+id/ip1"
             android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="从一"
+                android:textSize="15sp"
+                android:onClick="onRadioButtonClicked"/>
 
             <RadioButton
                 android:id="@+id/radio2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="从一"
-                android:textSize="15sp" />
+                android:text="从二"
+                android:textSize="15sp"
+                android:onClick="onRadioButtonClicked"/>
 
             <RadioButton
                 android:id="@+id/radio3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="从二"
-                android:textSize="15sp" />
-
-            <RadioButton
-                android:id="@+id/radio4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
                 android:text="从三"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:onClick="onRadioButtonClicked"/>
 
         </RadioGroup>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_create"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/radio1"
-            android:text="建立连接" />
+            android:id="@+id/speedTxt1"
+            android:layout_below="@+id/radio0"
+            android:text="速度："/>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/send"
+        <TextView
+            android:id="@+id/speedTxt2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/radio1"
-            android:layout_toEndOf="@+id/btn_create"
-            android:text="发送数据"/>
+            android:layout_below="@+id/radio0"
+            android:layout_toEndOf="@+id/speedTxt1"
+            android:text="30 m/s" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_test"
-            android:layout_below="@+id/radio1"
-            android:layout_toEndOf="@+id/send"
-            android:text="测试"/>
+            android:id="@+id/seekBar_speed"
+            android:layout_below="@id/radio0"
+            android:max="100"
+            android:progress="30"
+            android:layout_toEndOf="@+id/speedTxt2"/>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_below="@+id/send"
+            android:layout_below="@+id/seekBar_speed"
             android:id="@+id/control">
             <LinearLayout
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
                 android:layout_height="200dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -111,6 +116,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:background="@drawable/round_button"
+                        android:onClick="sendStop"
                         android:text="STOP" />
 
                     <ImageButton
@@ -120,7 +126,11 @@
                         android:layout_above="@id/btn_stop"
                         android:layout_centerHorizontal="true"
                         android:background="@color/white"
+                        android:onClick="sendUp"
                         app:srcCompat="@drawable/ic_up" />
+
+
+
                     <ImageButton
                         android:id="@+id/ibtn_down"
                         android:layout_width="wrap_content"
@@ -128,7 +138,8 @@
                         app:srcCompat="@drawable/ic_down"
                         android:background="@color/white"
                         android:layout_below="@id/btn_stop"
-                        android:layout_centerHorizontal="true"/>
+                        android:layout_centerHorizontal="true"
+                        android:onClick="sendDown"/>
                     <ImageButton
                         android:id="@+id/ibtn_left"
                         android:layout_width="wrap_content"
@@ -136,7 +147,8 @@
                         android:src="@drawable/ic_left"
                         android:background="@color/white"
                         android:layout_toLeftOf="@+id/btn_stop"
-                        android:layout_centerVertical="true"/>
+                        android:layout_centerVertical="true"
+                        android:onClick="sendLeft"/>
                     <ImageButton
                         android:id="@+id/ibtn_right"
                         android:layout_width="wrap_content"
@@ -144,26 +156,87 @@
                         android:src="@drawable/ic_right"
                         android:background="@color/white"
                         android:layout_toRightOf="@+id/btn_stop"
-                        android:layout_centerVertical="true"/>
+                        android:layout_centerVertical="true"
+                        android:onClick="sendRight"/>
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <EditText
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_width="200dp"
-            android:id="@+id/edt_ReceiveMessage"
-            android:layout_below="@+id/control"
-            android:minLines="20"
-            android:inputType="textMultiLine"
-            android:focusableInTouchMode="false"
-            android:focusable="false"/>
+            android:text="从车一"
+            android:id="@+id/car1"
+            android:layout_below="@id/control"/>
+
+        <CheckBox
+            android:id="@+id/checkbox1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/control"
+            android:layout_alignBaseline="@+id/car1"
+            android:layout_toEndOf="@+id/car1"
+            android:onClick="onCheckboxClicked"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="从车二"
+            android:id="@+id/car2"
+            android:layout_below="@id/control"
+            android:layout_toEndOf="@+id/checkbox1"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/control"
+            android:id="@+id/checkbox2"
+            android:layout_toEndOf="@+id/car2"
+            android:layout_alignBaseline="@+id/car2"
+            android:onClick="onCheckboxClicked"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="从车三"
+            android:id="@+id/car3"
+            android:layout_below="@id/control"
+            android:layout_toEndOf="@+id/checkbox2"/>
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/control"
+            android:id="@+id/checkbox3"
+            android:layout_toEndOf="@id/car3"
+            android:layout_alignBaseline="@+id/car2"
+            android:onClick="onCheckboxClicked"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="参与编队车辆:"
+            android:id="@+id/formTxt"
+            android:layout_below="@+id/checkbox1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/masterCar"
+            android:layout_below="@id/formTxt"
+            android:text="主车  "/>
+
+        <TextView
+            android:id="@+id/formCar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/formTxt"
+            android:layout_toEndOf="@+id/masterCar" />
+
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/nextPage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:text="下一页"
-            android:id="@+id/nextPage"/>
+            android:text="下一页" />
     </RelativeLayout>
 
     <LinearLayout

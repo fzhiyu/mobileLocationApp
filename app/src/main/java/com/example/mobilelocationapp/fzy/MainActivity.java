@@ -1,7 +1,5 @@
 package com.example.mobilelocationapp.fzy;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -124,10 +122,10 @@ public class MainActivity extends AppCompatActivity{
         edt3 = findViewById(R.id.edt3);
         edt4 = findViewById(R.id.edt4);
         text1 = findViewById(R.id.textClear);
-        radio1 = findViewById(R.id.radio1);
-        radio2 = findViewById(R.id.radio2);
-        radio3 = findViewById(R.id.radio3);
-        radio4 = findViewById(R.id.radio4);
+        radio1 = findViewById(R.id.radio0);
+        radio2 = findViewById(R.id.radio1);
+        radio3 = findViewById(R.id.radio2);
+        radio4 = findViewById(R.id.radio3);
         radioGroup = findViewById(R.id.radioGroup);
         btnChange = findViewById(R.id.btn_change);
         btnFirstToSecond = findViewById(R.id.btn_first_to_second);
