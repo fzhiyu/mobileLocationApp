@@ -105,6 +105,14 @@ public class MainActivity2 extends AppCompatActivity {
     RadioButton radio1;
     RadioButton radio2;
     RadioButton radio3;
+    TextView txtCar1;
+    TextView txtCar2;
+    TextView txtCar3;
+    TextView txtCar4;
+    String[] status;
+    //标志位
+    int[] car_isChecked = new int[3];
+    int speed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +133,10 @@ public class MainActivity2 extends AppCompatActivity {
         radio1 = findViewById(R.id.radio1);
         radio2 = findViewById(R.id.radio2);
         radio3 = findViewById(R.id.radio3);
+        txtCar1 = findViewById(R.id.txt_car1);
+        txtCar2 = findViewById(R.id.txt_car2);
+        txtCar3 = findViewById(R.id.txt_car3);
+        txtCar4 = findViewById(R.id.txt_car4);
 
         //显示IP地址
         txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
@@ -155,8 +167,8 @@ public class MainActivity2 extends AppCompatActivity {
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         Log.e(TAG, "BindService: " + myBinder );
 
-
-        Handler handler = new Handler();
+        //启动1s后建立tcp连接
+       Handler handler = new Handler();
         Runnable runnable = new Runnable(){
             @Override
             public void run() {
@@ -172,6 +184,9 @@ public class MainActivity2 extends AppCompatActivity {
         };
         handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
 
+        //创建定时器检测连接状态
+        detectConnect();
+
         //跳转下一页
         nextPage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,12 +201,61 @@ public class MainActivity2 extends AppCompatActivity {
         controlSpeed();
     }
 
+    //检测连接状态
+    private void detectConnect() {
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable(){
+            @Override
+            public void run() {
+                status = myService.getStatus();
+                String curr1 = String.valueOf(txtCar1.getText());
+                if (!curr1.equals(status[0]) && status[0].equals("在线")) {
+                    txtCar1.setText(status[0]);
+                    txtCar1.setTextColor(Color.RED);
+                } else if (!curr1.equals(status[0]) && status[0].equals("离线")) {
+                    txtCar1.setText(status[0]);
+                    txtCar1.setTextColor(Color.BLACK);
+                }
+                if (!String.valueOf(txtCar2.getText()).equals(status[1]) && status[1].equals("在线")) {
+                    txtCar2.setText(status[1]);
+                    txtCar2.setTextColor(Color.RED);
+                } else if (!String.valueOf(txtCar1.getText()).equals(status[1]) && status[1].equals("离线")) {
+                    txtCar2.setText(status[1]);
+                    txtCar2.setTextColor(Color.BLACK);
+                }
+                if (!String.valueOf(txtCar3.getText()).equals(status[2]) && status[2].equals("在线")) {
+                    txtCar3.setText(status[2]);
+                    txtCar3.setTextColor(Color.RED);
+                } else if (!String.valueOf(txtCar1.getText()).equals(status[2]) && status[2].equals("离线")) {
+                    txtCar3.setText(status[2]);
+                    txtCar3.setTextColor(Color.BLACK);
+                }
+                if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("在线")) {
+                    txtCar4.setText(status[3]);
+                    txtCar4.setTextColor(Color.RED);
+                } else if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("离线")) {
+                    txtCar4.setText(status[3]);
+                    txtCar4.setTextColor(Color.BLACK);
+                }
+                handler.postDelayed(this, 1000);// 50ms后执行this，即runable
+            }
+        };
+        handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
+    }
+
+    @Override
+    protected void onDestroy() {
+        unbindService(connection);
+        super.onDestroy();
+    }
+
     private void controlSpeed() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                speedTxt.setText(i + " m/s");
+                speed = i / 100;
+                speedTxt.setText(i / 100 + " m/s");
             }
 
             @Override
@@ -231,12 +295,15 @@ public class MainActivity2 extends AppCompatActivity {
         switch(view.getId()) {
             case R.id.checkbox1:
                 if (checked) {
+                    car_isChecked[0] = 1;
                     formCars.addFirst(car1);
                     radio1.setEnabled(true);
                 } else {
+                    car_isChecked[0] = 0;
                     formCars.remove(car1);
                     radio1.setEnabled(false);
                     radio1.setChecked(false);
+                    erasePoint(1102);
                 }
                 convertCar(formCars);
                 break;
@@ -250,10 +317,13 @@ public class MainActivity2 extends AppCompatActivity {
                         formCars.add(car2);
                     }
                     radio2.setEnabled(true);
+                    car_isChecked[1] = 1;
                 } else {
                     radio2.setEnabled(false);
                     radio2.setChecked(false);
                     formCars.remove(car2);
+                    car_isChecked[1] = 0;
+                    erasePoint(1103);
                 }
                 convertCar(formCars);
                 break;
@@ -261,10 +331,13 @@ public class MainActivity2 extends AppCompatActivity {
                 if (checked) {
                     formCars.addLast(car3);
                     radio3.setEnabled(true);
+                    car_isChecked[2] = 1;
                 } else {
                     formCars.remove(car3);
                     radio3.setEnabled(false);
                     radio3.setChecked(false);
+                    car_isChecked[2] = 0;
+                    erasePoint(1104);
                 }
                 convertCar(formCars);
                 break;
@@ -281,23 +354,23 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     public void sendStop(View view) {
-        myBinder.sendMessageBind("STOP 1\r\n", currRadio);
+        myBinder.sendMessageBind("STOP 1\r\n", currRadio, getApplicationContext());
     }
 
     public void sendUp(View view) {
-        myBinder.sendMessageBind("UP 1 2\r\n", currRadio);
+        myBinder.sendMessageBind("UP 1 2\r\n", currRadio, getApplicationContext());
     }
 
     public void sendDown(View view) {
-        myBinder.sendMessageBind("DOWN 1 2\r\n", currRadio);
+        myBinder.sendMessageBind("DOWN 1 2\r\n", currRadio, getApplicationContext());
     }
 
     public void sendLeft(View view) {
-        myBinder.sendMessageBind("LEFT 1 2\r\n", currRadio);
+        myBinder.sendMessageBind("LEFT 1 2\r\n", currRadio, getApplicationContext());
     }
 
     public void sendRight(View view) {
-        myBinder.sendMessageBind("RIGHT 1 2\r\n", currRadio);
+        myBinder.sendMessageBind("RIGHT 1 2\r\n", currRadio, getApplicationContext());
     }
 
     public void onRadioButtonClicked(View view) {
@@ -343,30 +416,50 @@ public class MainActivity2 extends AppCompatActivity {
                 String message = intent.getStringExtra("V_actual");
                 int port = intent.getIntExtra("port", -1);
 
-                Log.e(TAG, "onReceive: " + port + " " + System.currentTimeMillis());
-                String[] messageData = message.split(" ");
-                //如果相同端口有点则用白点再画一遍
-                Car update_car = new Car();
-                for (Car car : cars) {
-                    if (car.getPort() == port){
-                        update_car = car;
-                        cars.remove(car);
-                        myDrawView.erasePoint(update_car.getX(), update_car.getY());
-                        break;
-                    }
+                if (car_isChecked[port - 1102] == 1) {
+                    drawPoint(port, message);
                 }
-
-                paintX = Float.parseFloat(messageData[1]) * 100 + circleX;
-                paintY = Float.parseFloat(messageData[2]) * 100 + circleY;
-                //存储数据，每次画新点之前，将旧点抹去
-                update_car.setX(paintX);
-                update_car.setY(paintY);
-                update_car.setPort(port);
-                cars.add(update_car);
-
-                myDrawView.drawPoint();
             }
         }
+    }
+
+    //消除点
+    private void erasePoint(int port) {
+        //如果相同端口有点则用白点再画一遍
+
+        for (Car car : cars) {
+            if (car.getPort() == port) {
+                cars.remove(car);
+                myDrawView.erasePoint(car.getName(), car.getX(), car.getY());
+                break;
+            }
+        }
+    }
+
+    //画点
+    private void drawPoint(int port, String message) {
+        Log.e(TAG, "onReceive: " + port + " " + System.currentTimeMillis());
+        String[] messageData = message.split(" ");
+        Car update_car = new Car();
+
+        erasePoint(port);
+
+        paintX = Float.parseFloat(messageData[1]) * 100 + circleX;
+        paintY = Float.parseFloat(messageData[2]) * 100 + circleY;
+        //存储数据，每次画新点之前，将旧点抹去
+        update_car.setX(paintX);
+        update_car.setY(paintY);
+        update_car.setPort(port);
+        if (port == 1102) {
+            update_car.setName("一");
+        } else if (port == 1103) {
+            update_car.setName("二");
+        } else if (port == 1104) {
+            update_car.setName("三");
+        }
+        cars.add(update_car);
+
+        myDrawView.drawPoint(update_car.getName());
     }
 
     public class MyDrawView extends View {
@@ -458,19 +551,21 @@ public class MainActivity2 extends AppCompatActivity {
             return true;
         }
 
-        public void drawPoint() {
+        public void drawPoint(String name) {
             paint.setStrokeWidth(10f);
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.BLACK);
             my_canvas.drawPoint(paintX, paintY, paint);
+            my_canvas.drawText(name, paintX + 10, paintY + 10, paint);
             invalidate();
         }
 
-        public void erasePoint(float paintX, float paintY) {
+        public void erasePoint(String name, float paintX, float paintY) {
             paint.setStrokeWidth(11f);
-            paint.setStyle(Paint.Style.FILL);
+            paint.setStyle(Paint.Style.FILL_AND_STROKE);
             paint.setColor(Color.WHITE);
             my_canvas.drawPoint(paintX, paintY, paint);
+            my_canvas.drawText(name, paintX + 10, paintY + 10, paint);
             invalidate();
         }
     }

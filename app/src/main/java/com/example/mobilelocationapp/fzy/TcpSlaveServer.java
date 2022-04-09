@@ -32,6 +32,8 @@ public class TcpSlaveServer implements Runnable{
     InputThread inputThread;
     BufferedReader br;
     private PrintWriter printWriter;
+    ServerSocket serverSocket;
+    Socket socket;
 
     public TcpSlaveServer(int port, Context context) {
         this.host = host;
@@ -40,14 +42,24 @@ public class TcpSlaveServer implements Runnable{
         isOpen = true;
     }
 
-    ServerSocket serverSocket;
+    //获取连接状态
+    public boolean getStatus() {
+        boolean status;
+        if (socket != null) {
+            status = !socket.isClosed();
+//            Log.e(TAG, "getStatus: " + status );
+        } else {
+            status = false;
+        }
+        return status;
+    }
 
     @Override
     public void run() {
         try {
             serverSocket = new ServerSocket(port);
             while (isOpen) {
-                Socket socket = getSocket(serverSocket);
+                socket = getSocket(serverSocket);
                 if(socket != null) {
                     inputThread = new InputThread(socket, context);
 //                    new HeartThread();
@@ -69,7 +81,7 @@ public class TcpSlaveServer implements Runnable{
     }
 
     //线程 处理输入
-    public class InputThread extends Thread {
+    public class InputThread extends Thread{
         private final Socket socket;
         private Context context;
         private InputStream inputStream;
@@ -90,71 +102,45 @@ public class TcpSlaveServer implements Runnable{
         }
 
         public void sendData(String msg){
-            printWriter.print(msg);
-            printWriter.flush();
+            if (printWriter != null) {
+                printWriter.print(msg);
+                printWriter.flush();
+            }
         }
 
         @Override
         public void run() {
-            byte[] buff = new byte[100];
-            LinkedList<Long> timeList= new LinkedList<>();
             boolean flag = true;
 
             while (!socket.isClosed() && flag) {
                 String str = null;
                 try {
-                    if ((str = br.readLine()) != null) {
-                        Log.e(TAG, "run: " + str );
-                        inputThread.sendData("OK\r\n");
-                    }
-                    if (str != null && str.charAt(0) == 'V') {
-                        Intent intent = new Intent();
-                        String action = "get" + port;
-                        intent.setAction(action);
-                        intent.putExtra("V_actual", str);
-                        intent.putExtra("port", port);
-                        context.sendBroadcast(intent);
-                    }
-
+                    str = br.readLine();
                 } catch (IOException e) {
+                    try {
+                        br.close();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                     e.printStackTrace();
                 }
-//                try {
-//                    int messageLen = inputStream.read(buff);
-//                    if(messageLen != -1) {
-//                        String message = new String(buff, 0, messageLen);
-//                        Log.e(Tag, "接收消息: " + message);
-//                        if (message.equals("AT+CIPSTATUS\r\n")) {
-//                            inputThread.sendData("OK\r\n");
-//                            long currentTime = System.currentTimeMillis();
-//                            timeList.add(currentTime);
-//                            int len = timeList.size();
-//                            if (len > 1) {
-//                                if (timeList.get(len - 1) - timeList.get(len - 2) > 2500) {
-//                                    Log.e(TAG, "连接断开");
-//                                    flag = false;
-//                                }
-//                            }
-//                            if (len == 3) {
-//                                timeList.removeFirst();
-//                            }
-//                        }
-//                        if (message.charAt(0) == 'V') {
-//                            Intent intent = new Intent();
-//                            intent.setAction("getV");
-//                            intent.putExtra("V_actual", message);
-//                            context.sendBroadcast(intent);
-//                        }
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                if (str != null && str.equals("AT+CIPSTATUS")) {
+                    Log.e(TAG, "run: " + str );
+                    inputThread.sendData("OK\r\n");
+                }
+                if (str != null && str.charAt(0) == 'V') {
+                    Intent intent = new Intent();
+                    String action = "get" + port;
+                    intent.setAction(action);
+                    intent.putExtra("V_actual", str);
+                    intent.putExtra("port", port);
+                    context.sendBroadcast(intent);
+                }
             }
 
             try {
-                inputThread = null;
-                inputStream.close();
                 socket.close();
+                Log.e(TAG, "run: 从车服务器关闭" );
             } catch (IOException e) {
                 e.printStackTrace();
             }

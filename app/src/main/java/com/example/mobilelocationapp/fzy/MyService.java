@@ -1,11 +1,17 @@
 package com.example.mobilelocationapp.fzy;
 
+import static android.service.controls.ControlsProviderService.TAG;
+
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,13 +23,16 @@ public class MyService extends Service {
     TcpSlaveServer tcpSlaveServer2;
     TcpSlaveServer tcpSlaveServer3;
     TcpMasterServer tcpMasterServer;
+    String[] status;
+    String onLine = "在线";
+    String offLine = "离线";
 
     public class MyBinder extends Binder{
         public MyService getService() {
             return MyService.this;
         }
-        public void sendMessageBind(String message, int currRadio) {
-            sendMessage(message, currRadio);
+        public void sendMessageBind(String message, int currRadio, Context context) {
+            sendMessage(message, currRadio, context);
         }
         public void createTcpBind() {
             createTcp();
@@ -36,7 +45,7 @@ public class MyService extends Service {
 //        exec = Executors.newCachedThreadPool();
 //        exec.execute(tcpServer);
 
-        TcpMasterServer tcpMasterServer = new TcpMasterServer(this);
+        tcpMasterServer = new TcpMasterServer(this);
         tcpSlaveServer1 = new TcpSlaveServer(1102, this);
         tcpSlaveServer2 = new TcpSlaveServer(1103, this);
         tcpSlaveServer3 = new TcpSlaveServer(1104, this);
@@ -47,22 +56,72 @@ public class MyService extends Service {
         exec.execute(tcpSlaveServer3);
     }
 
-    private void sendMessage(String message, int currRadio) {
+    //获取连接状态
+    public String[] getStatus() {
+        status = new String[4];
+        String master, slave1, slave2, slave3;
+        if (tcpMasterServer.getStatus()) {
+            master = onLine;
+        } else {
+            master = offLine;
+        }
+        if (tcpSlaveServer1.getStatus()) {
+            slave1 = onLine;
+        } else {
+            slave1 = offLine;
+        }
+        if (tcpSlaveServer2.getStatus()) {
+            slave2 = onLine;
+        } else {
+            slave2 = offLine;
+        }
+        if (tcpSlaveServer3.getStatus()) {
+            slave3 = onLine;
+        } else {
+            slave3 = offLine;
+        }
+
+        status[0] = master;
+        status[1] = slave1;
+        status[2] = slave2;
+        status[3] = slave3;
+        return status;
+    }
+
+    //发送信息
+    private void sendMessage(String message, int currRadio, Context context) {
         switch (currRadio) {
             case 0:
-                exec.execute(() -> tcpMasterServer.inputThread.sendData(message));
+                if (tcpMasterServer.inputThread != null) {
+                    exec.execute(() -> tcpMasterServer.inputThread.sendData(message));
+                } else {
+                    Toast.makeText(context, "主车未连接", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case 1:
-                exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
+                if (tcpSlaveServer1.inputThread != null) {
+                    exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
+                } else {
+                    Toast.makeText(context, "从车一未连接", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case 2:
-                exec.execute(() -> tcpSlaveServer2.inputThread.sendData(message));
+                if (tcpSlaveServer2.inputThread != null) {
+                    exec.execute(() -> tcpSlaveServer2.inputThread.sendData(message));
+                } else {
+                    Toast.makeText(context, "从车二未连接", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case 3:
-                exec.execute(() -> tcpSlaveServer3.inputThread.sendData(message));
+                if (tcpSlaveServer3.getStatus()) {
+                    exec.execute(() -> tcpSlaveServer3.inputThread.sendData(message));
+                } else {
+                    Toast.makeText(context, "从车三未连接", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
                 break;
         }
-        exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
     }
 
     @Override

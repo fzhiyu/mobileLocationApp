@@ -5,8 +5,17 @@ public class Car {
     private float y;
     private double length;
     private double radius;
-    private String checkedRadio;
+    private String name;
     private int port = -1;
+    private boolean isChecked = false;
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
 
     public Car(float x, float y, int port) {
         this.x = x;
@@ -26,10 +35,10 @@ public class Car {
         this.port = port;
     }
 
-    public Car(float x, float y, String checkedRadio) {
+    public Car(float x, float y, String name) {
         this.x = x;
         this.y = y;
-        this.checkedRadio = checkedRadio;
+        this.name = name;
     }
 
     public Car(float x, float y, double length, double radius) {
@@ -39,12 +48,12 @@ public class Car {
         this.radius = radius;
     }
 
-    public Car(float x, float y, double length, double radius, String checkedRadio) {
+    public Car(float x, float y, double length, double radius, String name) {
         this.x = x;
         this.y = y;
         this.length = length;
         this.radius = radius;
-        this.checkedRadio = checkedRadio;
+        this.name = name;
     }
 
     public Car() {
@@ -82,12 +91,12 @@ public class Car {
         this.radius = radius;
     }
 
-    public String getCheckedRadio() {
-        return checkedRadio;
+    public String getName() {
+        return name;
     }
 
-    public void setCheckedRadio(String checkedRadio) {
-        this.checkedRadio = checkedRadio;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -97,7 +106,7 @@ public class Car {
                 ", y=" + y +
                 ", length=" + length +
                 ", radius=" + radius +
-                ", checkedBox='" + checkedRadio + '\'' +
+                ", checkedBox='" + name + '\'' +
                 '}';
     }
 }

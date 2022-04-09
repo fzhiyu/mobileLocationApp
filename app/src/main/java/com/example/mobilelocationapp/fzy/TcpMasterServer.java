@@ -27,6 +27,7 @@ public class TcpMasterServer implements Runnable{
     private Context context;
     String Tag = "fzy";
     InputThread inputThread;
+    Socket socket;
 
     public TcpMasterServer(Context context) {
         this.host = host;
@@ -42,7 +43,7 @@ public class TcpMasterServer implements Runnable{
         try {
             serverSocket = new ServerSocket(port);
             while (isOpen) {
-                Socket socket = getSocket(serverSocket);
+                socket = getSocket(serverSocket);
                 if(socket != null) {
                     inputThread = new InputThread(socket, context);
 //                    new HeartThread();
@@ -61,6 +62,18 @@ public class TcpMasterServer implements Runnable{
             Log.e(TAG, "更新状态");
             return null;
         }
+    }
+
+    //获取状态
+    public boolean getStatus() {
+        boolean status;
+        if (socket != null) {
+            status = !socket.isClosed();
+//            Log.e(TAG, "getStatus: " + status );
+        } else {
+            status = false;
+        }
+        return status;
     }
 
     //线程 处理输入
@@ -97,11 +110,18 @@ public class TcpMasterServer implements Runnable{
 
             while (!socket.isClosed() && flag) {
                 try {
-                    int messageLen = inputStream.read(buff);
+                    int messageLen = -2;
+                    try {
+                        messageLen = inputStream.read(buff);
+                    } catch (IOException e) {
+                        inputStream.close();
+                        e.printStackTrace();
+                    }
+
                     if(messageLen != -1) {
                         String message = new String(buff, 0, messageLen);
-                        Log.e(Tag, "接收消息: " + message);
-                        if (message.equals("AT+CIPSTATUS\r\n")) {
+
+                        if (message.equals("AT+CIPSTATUS")) {
                             inputThread.sendData("OK\r\n");
                             long currentTime = System.currentTimeMillis();
                             timeList.add(currentTime);
@@ -125,7 +145,6 @@ public class TcpMasterServer implements Runnable{
             try {
                 socket.close();
                 inputThread = null;
-                inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

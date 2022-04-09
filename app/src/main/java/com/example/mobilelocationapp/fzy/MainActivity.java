@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity{
                     paint.setStrokeWidth(textWidth);
                     paint.setTextSize(textSize);
                     paint.setStyle(Paint.Style.FILL_AND_STROKE);
-                    my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
+                    my_canvas.drawText(car.getName(), car.getX() + 10,car.getY() + 10, paint);
                 }
                 txtSecond.setText("");
                 txtThird.setText("");
@@ -264,10 +264,10 @@ public class MainActivity extends AppCompatActivity{
         paint.setStrokeWidth(textWidth);
         paint.setTextSize(textSize);
         paint.setStyle(Paint.Style.FILL);
-        my_canvas.drawText(car.getCheckedRadio(), car.getX() + 10,car.getY() + 10, paint);
+        my_canvas.drawText(car.getName(), car.getX() + 10,car.getY() + 10, paint);
 
         cars.remove(car);
-        String radio = car.getCheckedRadio();
+        String radio = car.getName();
         Car car1 = new Car(changeX, changeY, changeLength, changeRadius, radio);
         cars.add(car1);
         switch (radio) {
@@ -289,12 +289,12 @@ public class MainActivity extends AppCompatActivity{
         my_canvas.drawPoint(car1.getX(), car1.getY(), paint);
         paint.setStrokeWidth(textWidth);
         paint.setTextSize(textSize);
-        my_canvas.drawText(car1.getCheckedRadio(), car1.getX() + 10,car1.getY() + 10, paint);
+        my_canvas.drawText(car1.getName(), car1.getX() + 10,car1.getY() + 10, paint);
     }
 
     private Car checkRadio() {
         for (Car car : cars) {
-            if (car.getCheckedRadio().equals(selectedName)) {
+            if (car.getName().equals(selectedName)) {
                 return car;
             }
         }
@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity{
             //检查是否重复选择
             checkedFlag = false;
             for (Car car : cars) {
-                if (car.getCheckedRadio().equals(selectedName)) {
+                if (car.getName().equals(selectedName)) {
                     checkedFlag = true;
                     break;
                 }
