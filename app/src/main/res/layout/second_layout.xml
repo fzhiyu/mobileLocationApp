@@ -196,72 +196,17 @@
 
     </LinearLayout>
 
-    <!--    <View-->
-    <!--        android:layout_width="1dp"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:background="@color/gray"/>-->
 
-    <!--    图示-->
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/rLayout"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
-        <RelativeLayout
-            android:id="@+id/rLayout"
+        android:layout_weight="2"
+        android:layout_gravity="center">
+        <com.example.mobilelocationapp.CanvasView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
 
-            <com.example.mobilelocationapp.CanvasView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </RelativeLayout>
-
-
-
-    </LinearLayout>
-
-    <!--误差曲线-->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="X轴误差"
-                android:layout_gravity="center_horizontal"/>
-            <LinearLayout
-                android:id="@+id/llayout_X_error"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Y轴误差"
-                android:layout_gravity="center_horizontal"/>
-            <LinearLayout
-                android:id="@+id/llayout_Y_error"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"/>
-        </LinearLayout>
-
-    </LinearLayout>
 
 </LinearLayout>

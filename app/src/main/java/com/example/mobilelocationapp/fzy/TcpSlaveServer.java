@@ -136,6 +136,19 @@ public class TcpSlaveServer implements Runnable{
                     intent.putExtra("port", port);
                     context.sendBroadcast(intent);
                 }
+
+                if (str != null && !str.equals("")){
+                    String[] strings = str.split(" "); //将字符串切分开
+
+                    if (strings[0].compareToIgnoreCase("target") == 0){//收到类型为target的消息
+                        Intent intent = new Intent();
+                        String action = "get" + port;
+                        intent.setAction(action);
+                        intent.putExtra("target", str);
+                        intent.putExtra("port", port);
+                        context.sendBroadcast(intent);
+                    }
+                }
             }
 
             try {

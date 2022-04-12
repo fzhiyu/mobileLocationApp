@@ -1,6 +1,8 @@
 package com.example.mobilelocationapp.chart;
 
-public class TargetPoint {
+import java.io.Serializable;
+
+public class TargetPoint implements Serializable {
 
     private Double X;
     private Double Y;

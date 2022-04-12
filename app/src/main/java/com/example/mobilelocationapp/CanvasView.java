@@ -4,24 +4,33 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.icu.util.MeasureUnit;
 import android.net.wifi.hotspot2.omadm.PpsMoParser;
+import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
 public class CanvasView extends View {
     private static final float STROKE_WIDTH = 1F / 256F; // 描边宽度
+    private static final String SCALE_RULER = "1m";//标度尺
 
-    private Paint paint;//画笔
+    private Paint paint, textPaint;//画笔
     private Context mContext;//上下文引用
 
-    private int size;//控件边长
+    private float textOffsetY;//文本的Y轴偏移量
+
+    private int size;//控件最小边长
+    private int sizeH, sizeW;//控件的宽高
 
     private int ccX, ccY; // 圆心坐标
     private float strokeWidth; //描边宽度
-    private float radius; //第一个圆的半径
+    private float radius; //圆的半径
+
+    private float m_to_dp = 50;//表示用多少dp代表一米
 
     public CanvasView(Context context){
         this(context, null);
@@ -55,42 +64,56 @@ public class CanvasView extends View {
          * 注意：当setStrokeWidth(0)的时候描边宽度并不为0而是只占一个像素
          */
         paint.setStrokeWidth(strokeWidth);
+
+        //初始化文字画笔
+        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.SUBPIXEL_TEXT_FLAG);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(20);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+
+        textOffsetY = (textPaint.ascent() + textPaint.descent()) / 2;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        //绘制圆环
-        while (radius > 30){
-            canvas.drawCircle(ccX,  ccY, radius, paint);
-            //半径减30px
-            radius -= 30;
+
+        radius = m_to_dp;
+        while (radius < size / 2){
+
+            canvas.drawCircle(ccX, ccY, radius, paint);
+
+            radius += m_to_dp;
         }
 
         //画十字交叉线
-        canvas.drawLine(0, ccY, size, ccY, paint);
-        canvas.drawLine(ccX, 0, ccX, size, paint);
+        canvas.drawLine(ccX - (radius - m_to_dp), ccY, ccX + (radius - m_to_dp), ccY, paint);//横线
+        canvas.drawLine(ccX, ccY - (radius - m_to_dp), ccX, ccY + (radius - m_to_dp), paint);//竖线
+
+        canvas.drawText(SCALE_RULER, ccX + (radius -  m_to_dp * (float)1.5), ccY, textPaint);//画标度尺
 
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //强制长宽一样
-        super.onMeasure(widthMeasureSpec, widthMeasureSpec);
-    }
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        //强制长宽一样
+//        super.onMeasure(widthMeasureSpec, widthMeasureSpec / 2);
+//        Log.e("hejun", "onMeasure: " + widthMeasureSpec + " " + heightMeasureSpec );
+//    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         //获取控件的边长
-        size = w;
+        sizeW = w;
+        sizeH = h;
+        size = Math.min(w, h) ;
 
         strokeWidth = STROKE_WIDTH * size; //描边宽度
         //圆心坐标
-        ccX = size / 2;
-        ccY = size / 2;
-        //圆的半径
-        radius = size / 2;
+        ccX = sizeW / 2;
+        ccY = sizeH / 2;
+
     }
 
     public synchronized void update(){

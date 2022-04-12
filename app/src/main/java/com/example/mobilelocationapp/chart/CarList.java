@@ -1,8 +1,9 @@
 package com.example.mobilelocationapp.chart;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class CarList {
+public class CarList implements Serializable {
     private ArrayList<RealPoint> realPointList = new ArrayList<>();
     private ArrayList<TargetPoint> targetPointList = new ArrayList<>();
 
@@ -26,7 +27,7 @@ public class CarList {
 
 
     public void addRealPoint(double x, double y){
-        addRealPoint(new RealPoint(x, y));
+        addRealPoint(new RealPoint(port, x, y));
     }
 
     public void addRealPoint(RealPoint realPoint){
@@ -58,6 +59,10 @@ public class CarList {
             yErrorList.add(realPointList.get(i).getY() - targetPointList.get(i).getY());
         }
         return yErrorList;
+    }
+
+    public boolean isEmpty(){
+        return realPointList.isEmpty() || targetPointList.isEmpty();
     }
 
 }

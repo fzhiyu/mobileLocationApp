@@ -122,6 +122,7 @@ public class MyService extends Service {
             default:
                 break;
         }
+        exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
     }
 
     @Override
