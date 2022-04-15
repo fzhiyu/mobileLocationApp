@@ -109,11 +109,12 @@ public class MainActivity2 extends AppCompatActivity {
     TextView txtCar2;
     TextView txtCar3;
     TextView txtCar4;
-    String[] status;
+    String[] status = new String[4];
     //标志位
     int[] car_isChecked = new int[3];
-    int speed;
+    float speed = 0.30f;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +130,7 @@ public class MainActivity2 extends AppCompatActivity {
         txtIP = findViewById(R.id.ip2);
         seekBar = findViewById(R.id.seekBar_speed);
         speedTxt = findViewById(R.id.speedTxt2);
-        formCar = findViewById(R.id.formCar);
+//        formCar = findViewById(R.id.formCar);
         radio1 = findViewById(R.id.radio1);
         radio2 = findViewById(R.id.radio2);
         radio3 = findViewById(R.id.radio3);
@@ -142,6 +143,8 @@ public class MainActivity2 extends AppCompatActivity {
         txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
         //控制平板横向
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //设置速度
+        speedTxt.setText(speed + "m/s");
 
         //获取view的长宽
         linearLayout = findViewById(R.id.linearlayout);
@@ -178,7 +181,7 @@ public class MainActivity2 extends AppCompatActivity {
                     myBinder.createTcpBind();
 
                 }
-                Log.e(TAG, "run: handler;");
+//                Log.e(TAG, "run: handler;");
                 handler.removeCallbacks(this);
             }
         };
@@ -207,35 +210,37 @@ public class MainActivity2 extends AppCompatActivity {
         Runnable runnable = new Runnable(){
             @Override
             public void run() {
-                status = myService.getStatus();
-                String curr1 = String.valueOf(txtCar1.getText());
-                if (!curr1.equals(status[0]) && status[0].equals("在线")) {
-                    txtCar1.setText(status[0]);
-                    txtCar1.setTextColor(Color.RED);
-                } else if (!curr1.equals(status[0]) && status[0].equals("离线")) {
-                    txtCar1.setText(status[0]);
-                    txtCar1.setTextColor(Color.BLACK);
-                }
-                if (!String.valueOf(txtCar2.getText()).equals(status[1]) && status[1].equals("在线")) {
-                    txtCar2.setText(status[1]);
-                    txtCar2.setTextColor(Color.RED);
-                } else if (!String.valueOf(txtCar1.getText()).equals(status[1]) && status[1].equals("离线")) {
-                    txtCar2.setText(status[1]);
-                    txtCar2.setTextColor(Color.BLACK);
-                }
-                if (!String.valueOf(txtCar3.getText()).equals(status[2]) && status[2].equals("在线")) {
-                    txtCar3.setText(status[2]);
-                    txtCar3.setTextColor(Color.RED);
-                } else if (!String.valueOf(txtCar1.getText()).equals(status[2]) && status[2].equals("离线")) {
-                    txtCar3.setText(status[2]);
-                    txtCar3.setTextColor(Color.BLACK);
-                }
-                if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("在线")) {
-                    txtCar4.setText(status[3]);
-                    txtCar4.setTextColor(Color.RED);
-                } else if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("离线")) {
-                    txtCar4.setText(status[3]);
-                    txtCar4.setTextColor(Color.BLACK);
+                if (myService != null) {
+                    status = myService.getStatus();
+                    String curr1 = String.valueOf(txtCar1.getText());
+                    if (!curr1.equals(status[0]) && status[0].equals("在线")) {
+                        txtCar1.setText(status[0]);
+                        txtCar1.setTextColor(Color.RED);
+                    } else if (!curr1.equals(status[0]) && status[0].equals("离线")) {
+                        txtCar1.setText(status[0]);
+                        txtCar1.setTextColor(Color.BLACK);
+                    }
+                    if (!String.valueOf(txtCar2.getText()).equals(status[1]) && status[1].equals("在线")) {
+                        txtCar2.setText(status[1]);
+                        txtCar2.setTextColor(Color.RED);
+                    } else if (!String.valueOf(txtCar1.getText()).equals(status[1]) && status[1].equals("离线")) {
+                        txtCar2.setText(status[1]);
+                        txtCar2.setTextColor(Color.BLACK);
+                    }
+                    if (!String.valueOf(txtCar3.getText()).equals(status[2]) && status[2].equals("在线")) {
+                        txtCar3.setText(status[2]);
+                        txtCar3.setTextColor(Color.RED);
+                    } else if (!String.valueOf(txtCar1.getText()).equals(status[2]) && status[2].equals("离线")) {
+                        txtCar3.setText(status[2]);
+                        txtCar3.setTextColor(Color.BLACK);
+                    }
+                    if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("在线")) {
+                        txtCar4.setText(status[3]);
+                        txtCar4.setTextColor(Color.RED);
+                    } else if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("离线")) {
+                        txtCar4.setText(status[3]);
+                        txtCar4.setTextColor(Color.BLACK);
+                    }
                 }
                 handler.postDelayed(this, 1000);// 50ms后执行this，即runable
             }
@@ -254,8 +259,8 @@ public class MainActivity2 extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                speed = i / 100;
-                speedTxt.setText(i / 100 + " m/s");
+                speed = (float) i / 100;
+                speedTxt.setText(speed + " m/s");
             }
 
             @Override
@@ -269,7 +274,6 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
     }
-
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -350,7 +354,7 @@ public class MainActivity2 extends AppCompatActivity {
         for (String s : formCars) {
             stringBuilder.append(s);
         }
-        formCar.setText(stringBuilder);
+//        formCar.setText(stringBuilder);
     }
 
     public void sendStop(View view) {
@@ -503,7 +507,8 @@ public class MainActivity2 extends AppCompatActivity {
             bitmapY = 0;
             //圆心的坐标
             circleX = bitmapX + (float) ViewWidth / 2;
-            circleY = (float) ViewHeight / 2;
+//            circleY = (float) ViewHeight / 2;
+            circleY = 0;
             //圆半径
             radius = 450;
 
@@ -526,9 +531,13 @@ public class MainActivity2 extends AppCompatActivity {
             paint.setStyle(Paint.Style.STROKE);
             paint.setPathEffect(new DashPathEffect(new float[]{2,4},50));
             canvas.drawCircle(circleX, circleY, 50, paint);
+            canvas.drawCircle(circleX, circleY, 100, paint);
             canvas.drawCircle(circleX, circleY, 150, paint);
+            canvas.drawCircle(circleX, circleY, 200, paint);
             canvas.drawCircle(circleX, circleY, 250, paint);
+            canvas.drawCircle(circleX, circleY, 300, paint);
             canvas.drawCircle(circleX, circleY, 350, paint);
+            canvas.drawCircle(circleX, circleY, 400, paint);
             canvas.drawCircle(circleX, circleY, 450, paint);
             //画直线
             canvas.drawLine(lineStartX, circleY, lineEndX, circleY, paint);
@@ -538,7 +547,7 @@ public class MainActivity2 extends AppCompatActivity {
             //画比例尺
             paint.setTextSize(textSize);
             paint.setStyle(Paint.Style.FILL);
-            canvas.drawText("1:1米", ViewWidth - 300, 100, paint);
+            canvas.drawText("1格 : 0.5米", ViewWidth - 300, 100, paint);
             //画一
             canvas.drawText("主", circleX + 10, circleY + 10, paint);
 

@@ -46,7 +46,6 @@ public class TcpMasterServer implements Runnable{
                 socket = getSocket(serverSocket);
                 if(socket != null) {
                     inputThread = new InputThread(socket, context);
-//                    new HeartThread();
                 }
             }
         } catch (IOException e) {

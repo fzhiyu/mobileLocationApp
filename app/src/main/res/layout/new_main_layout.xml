@@ -7,7 +7,7 @@
 
     <RelativeLayout
         android:id="@+id/linearlayout1"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
@@ -23,144 +23,272 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/ip1" />
 
-        <TextView
-            android:id="@+id/selectCar2"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/layout1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ip1"
-            android:text="请选择一个小车：" />
-        <!--        <TextView-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_below="@+id/ip2"-->
-        <!--            android:id="@+id/radio1"/>-->
+            android:layout_below="@id/ip2">
 
-        <TextView
-            android:id="@+id/txt_car1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/selectCar2"
-            android:layout_marginStart="3dp"
-            android:text="离线"
-            android:textColor="@color/black" />
-
-        <TextView
-            android:id="@+id/txt_car2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/selectCar2"
-            android:layout_marginStart="30dp"
-            android:layout_toEndOf="@+id/txt_car1"
-            android:text="离线"
-            android:textColor="@color/black" />
-
-        <TextView
-            android:id="@+id/txt_car3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/selectCar2"
-            android:layout_marginStart="32dp"
-            android:layout_toEndOf="@+id/txt_car2"
-            android:text="离线"
-            android:textColor="@color/black" />
-
-        <TextView
-            android:id="@+id/txt_car4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/selectCar2"
-            android:layout_marginStart="35dp"
-            android:layout_toEndOf="@+id/txt_car3"
-            android:text="离线"
-            android:textColor="@color/black" />
-
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_below="@+id/txt_car1"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radio0"
+            <TextView
+                android:id="@+id/selectCar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/selectCar2"
-                android:checked="true"
-                android:onClick="onRadioButtonClicked"
-                android:text="主"
-                android:textSize="15sp" />
+                android:text="选择需要编队车辆:"
+                android:textColor="@color/black"
+                android:textStyle="italic" />
 
-            <RadioButton
-                android:id="@+id/radio1"
+            <TextView
+                android:id="@+id/car1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="false"
-                android:clickable="false"
-                android:enabled="false"
-                android:onClick="onRadioButtonClicked"
-                android:text="从一"
-                android:textSize="15sp" />
+                android:layout_below="@id/selectCar"
+                android:text="从车一" />
 
-            <RadioButton
-                android:id="@+id/radio2"
+            <CheckBox
+                android:id="@+id/checkbox1"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_below="@id/selectCar"
+                android:layout_toEndOf="@+id/car1"
+                android:onClick="onCheckboxClicked" />
+
+            <TextView
+                android:id="@+id/car2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="false"
-                android:enabled="false"
-                android:onClick="onRadioButtonClicked"
-                android:text="从二"
-                android:textSize="15sp" />
+                android:layout_below="@id/selectCar"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/checkbox1"
+                android:text="从车二" />
 
-            <RadioButton
-                android:id="@+id/radio3"
+            <CheckBox
+                android:id="@+id/checkbox2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="false"
-                android:enabled="false"
-                android:onClick="onRadioButtonClicked"
-                android:text="从三"
-                android:textSize="15sp" />
+                android:layout_below="@id/selectCar"
+                android:layout_alignBaseline="@+id/car2"
+                android:layout_toEndOf="@+id/car2"
+                android:onClick="onCheckboxClicked" />
 
-        </RadioGroup>
+            <TextView
+                android:id="@+id/car3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar"
+                android:layout_toEndOf="@+id/checkbox2"
+                android:text="从车三" />
 
+            <CheckBox
+                android:id="@+id/checkbox3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar"
+                android:layout_alignBaseline="@+id/car2"
+                android:layout_toEndOf="@id/car3"
+                android:onClick="onCheckboxClicked" />
 
-        <TextView
-            android:id="@+id/speedTxt1"
+            <!--            <TextView-->
+            <!--                android:id="@+id/formTxt"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_below="@+id/checkbox1"-->
+            <!--                android:text="参与编队车辆:" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/masterCar"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_below="@id/formTxt"-->
+            <!--                android:text="主车  " />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/formCar"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_below="@id/formTxt"-->
+            <!--                android:layout_marginStart="8dp"-->
+            <!--                android:layout_toEndOf="@+id/masterCar" />-->
+        </RelativeLayout>
+
+        <com.google.android.material.divider.MaterialDivider
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/radioGroup"
-            android:text="速度：" />
+            android:layout_below="@id/layout1"/>
 
-        <TextView
-            android:id="@+id/speedTxt2"
-            android:layout_width="wrap_content"
+
+        <RelativeLayout
+            android:id="@+id/layout2"
+            android:layout_width="400dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/radioGroup"
-            android:layout_toEndOf="@+id/speedTxt1"
-            android:text="30 m/s" />
+            android:layout_below="@id/layout1"
+            android:layout_marginEnd="0dp">
 
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/seekBar_speed"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/radioGroup"
-            android:layout_toEndOf="@+id/speedTxt2"
-            android:max="100"
-            android:progress="30" />
+            <TextView
+                android:id="@+id/selectCar2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="请选择一个小车进行控制："
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+            <!--        <TextView-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:layout_below="@+id/ip2"-->
+            <!--            android:id="@+id/radio1"/>-->
 
+
+            <RelativeLayout
+                android:id="@+id/layout3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar2">
+
+                <TextView
+                    android:id="@+id/link_status"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:text="连接状态:"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/txt_car1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_toEndOf="@+id/link_status"
+                    android:text="离线"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/txt_car2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_toEndOf="@+id/txt_car1"
+                    android:text="离线"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/txt_car3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_toEndOf="@+id/txt_car2"
+                    android:text="离线"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/txt_car4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="35dp"
+                    android:layout_toEndOf="@+id/txt_car3"
+                    android:text="离线"
+                    android:textColor="@color/black" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layout4"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/layout3">
+
+                <TextView
+                    android:id="@+id/selectCar3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="选择小车:"
+                    android:textColor="@color/black" />
+
+                <RadioGroup
+                    android:id="@+id/radioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_toEndOf="@id/selectCar3"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radio0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/selectCar2"
+                        android:checked="true"
+                        android:onClick="onRadioButtonClicked"
+                        android:text="主"
+                        android:textSize="15sp" />
+
+                    <RadioButton
+                        android:id="@+id/radio1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:clickable="false"
+                        android:enabled="false"
+                        android:onClick="onRadioButtonClicked"
+                        android:text="从一"
+                        android:textSize="15sp" />
+
+                    <RadioButton
+                        android:id="@+id/radio2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:enabled="false"
+                        android:onClick="onRadioButtonClicked"
+                        android:text="从二"
+                        android:textSize="15sp" />
+
+                    <RadioButton
+                        android:id="@+id/radio3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:enabled="false"
+                        android:onClick="onRadioButtonClicked"
+                        android:text="从三"
+                        android:textSize="15sp" />
+
+                </RadioGroup>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/speedTxt1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layout4"
+                android:text="速度：" />
+
+            <TextView
+                android:id="@+id/speedTxt2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layout4"
+                android:layout_toEndOf="@+id/speedTxt1"
+                android:text="30 m/s" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBar_speed"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/layout4"
+                android:layout_toEndOf="@+id/speedTxt2"
+                android:max="100"
+                android:progress="30" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/control"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/seekBar_speed"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/layout2"
             android:gravity="center">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp">
+                android:layout_height="fill_parent">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -219,96 +347,20 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/selectCar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/control"
-            android:text="选择需要编队车辆:" />
-
-        <TextView
-            android:id="@+id/car1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:text="从车一" />
-
-        <CheckBox
-            android:id="@+id/checkbox1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_alignBaseline="@+id/car1"
-            android:layout_toEndOf="@+id/car1"
-            android:onClick="onCheckboxClicked" />
-
-        <TextView
-            android:id="@+id/car2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_toEndOf="@+id/checkbox1"
-            android:text="从车二" />
-
-        <CheckBox
-            android:id="@+id/checkbox2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_alignBaseline="@+id/car2"
-            android:layout_toEndOf="@+id/car2"
-            android:onClick="onCheckboxClicked" />
-
-        <TextView
-            android:id="@+id/car3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_toEndOf="@+id/checkbox2"
-            android:text="从车三" />
-
-        <CheckBox
-            android:id="@+id/checkbox3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_alignBaseline="@+id/car2"
-            android:layout_toEndOf="@id/car3"
-            android:onClick="onCheckboxClicked" />
-
-        <TextView
-            android:id="@+id/formTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/checkbox1"
-            android:text="参与编队车辆:" />
-
-        <TextView
-            android:id="@+id/masterCar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/formTxt"
-            android:text="主车  " />
-
-        <TextView
-            android:id="@+id/formCar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/formTxt"
-            android:layout_toEndOf="@+id/masterCar" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/nextPage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:text="下一页" />
+            android:text="开始编队" />
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/linearlayout"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="300dp"
         android:layout_toEndOf="@+id/linearlayout1"
+        android:layout_marginTop="50dp"
         android:orientation="vertical" />
 </RelativeLayout>

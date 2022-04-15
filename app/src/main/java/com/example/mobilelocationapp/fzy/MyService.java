@@ -60,22 +60,22 @@ public class MyService extends Service {
     public String[] getStatus() {
         status = new String[4];
         String master, slave1, slave2, slave3;
-        if (tcpMasterServer.getStatus()) {
+        if (tcpMasterServer != null && tcpMasterServer.getStatus()) {
             master = onLine;
         } else {
             master = offLine;
         }
-        if (tcpSlaveServer1.getStatus()) {
+        if (tcpSlaveServer1 != null && tcpSlaveServer1.getStatus()) {
             slave1 = onLine;
         } else {
             slave1 = offLine;
         }
-        if (tcpSlaveServer2.getStatus()) {
+        if (tcpSlaveServer2 != null && tcpSlaveServer2.getStatus()) {
             slave2 = onLine;
         } else {
             slave2 = offLine;
         }
-        if (tcpSlaveServer3.getStatus()) {
+        if (tcpSlaveServer3 != null && tcpSlaveServer3.getStatus()) {
             slave3 = onLine;
         } else {
             slave3 = offLine;
@@ -85,6 +85,7 @@ public class MyService extends Service {
         status[1] = slave1;
         status[2] = slave2;
         status[3] = slave3;
+//        Log.e(TAG, "getStatus: " + status[0] );
         return status;
     }
 
@@ -113,7 +114,7 @@ public class MyService extends Service {
                 }
                 break;
             case 3:
-                if (tcpSlaveServer3.getStatus()) {
+                if (tcpSlaveServer2.inputThread != null) {
                     exec.execute(() -> tcpSlaveServer3.inputThread.sendData(message));
                 } else {
                     Toast.makeText(context, "从车三未连接", Toast.LENGTH_SHORT).show();
@@ -122,7 +123,6 @@ public class MyService extends Service {
             default:
                 break;
         }
-        exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
     }
 
     @Override
