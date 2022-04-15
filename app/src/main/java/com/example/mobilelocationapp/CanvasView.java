@@ -18,6 +18,9 @@ public class CanvasView extends View {
     private static final float STROKE_WIDTH = 1F / 256F; // 描边宽度
     private static final String SCALE_RULER = "1m";//标度尺
 
+    public static float m_to_dp = 50;//表示用多少dp代表一米
+    public static int paddingTop = 40;//距离顶部多少dp
+
     private Paint paint, textPaint;//画笔
     private Context mContext;//上下文引用
 
@@ -29,8 +32,6 @@ public class CanvasView extends View {
     private int ccX, ccY; // 圆心坐标
     private float strokeWidth; //描边宽度
     private float radius; //圆的半径
-
-    private float m_to_dp = 50;//表示用多少dp代表一米
 
     public CanvasView(Context context){
         this(context, null);
@@ -78,18 +79,21 @@ public class CanvasView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
         radius = m_to_dp;
-        while (radius < size / 2){
-
-            canvas.drawCircle(ccX, ccY, radius, paint);
+        canvas.save();
+        canvas.translate(ccX, ccY);
+        while (radius < size){
+            RectF oval = new RectF(-radius, -radius, radius, radius);
+            canvas.drawArc(oval, 0, 180, false, paint);
+            //canvas.drawCircle(ccX, ccY, radius, paint);
 
             radius += m_to_dp;
         }
+        canvas.restore();
 
         //画十字交叉线
         canvas.drawLine(ccX - (radius - m_to_dp), ccY, ccX + (radius - m_to_dp), ccY, paint);//横线
-        canvas.drawLine(ccX, ccY - (radius - m_to_dp), ccX, ccY + (radius - m_to_dp), paint);//竖线
+        canvas.drawLine(ccX, ccY, ccX, ccY + (radius - m_to_dp), paint);//竖线
 
         canvas.drawText(SCALE_RULER, ccX + (radius -  m_to_dp * (float)1.5), ccY, textPaint);//画标度尺
 
@@ -107,12 +111,12 @@ public class CanvasView extends View {
         //获取控件的边长
         sizeW = w;
         sizeH = h;
-        size = Math.min(w, h) ;
+        size = Math.min(w / 2, h - paddingTop) ;
 
         strokeWidth = STROKE_WIDTH * size; //描边宽度
         //圆心坐标
         ccX = sizeW / 2;
-        ccY = sizeH / 2;
+        ccY = paddingTop;
 
     }
 

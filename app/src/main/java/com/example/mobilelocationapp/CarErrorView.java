@@ -27,6 +27,7 @@ public class CarErrorView extends View {
     private int textSize = 20;//文字大小
     private float strokeWidth; //描边宽度
     private float radius = 20; //小车的半径
+    private int paddingTop = CanvasView.paddingTop;
 
     private int size, sizeW, sizeH;//控件边长
     private int ccX, ccY; // 圆心坐标
@@ -97,12 +98,12 @@ public class CarErrorView extends View {
         //获取控件的边长
         sizeW = w;
         sizeH = h;
-        size = Math.min(sizeW, sizeH);
+        size = Math.min(sizeW / 2, sizeH - paddingTop);
 
         strokeWidth = STROKE_WIDTH * size; //描边宽度
         //圆心坐标
         ccX = sizeW / 2;
-        ccY = sizeH / 2;
+        ccY = paddingTop;
     }
 
     @Override
@@ -115,7 +116,7 @@ public class CarErrorView extends View {
 
         for (int i = 0; i < carsNumber; i++){
             drawCar(canvas, (float) (cars[i].getDistance() * m_to_dp), (float)cars[i].getAngle(), cars[i].getPort() - Base_port);
-            Log.e("hejun", "onDraw: " + cars[i].getAngle() + " :" + cars[i].getPort());
+            Log.i("hejun", "onDraw: " + cars[i].getAngle() + " :" + cars[i].getPort());
         }
 
     }

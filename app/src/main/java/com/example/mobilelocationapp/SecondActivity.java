@@ -2,6 +2,7 @@ package com.example.mobilelocationapp;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -12,24 +13,45 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mobilelocationapp.chart.CarList;
+import com.example.mobilelocationapp.chart.ChartService;
 import com.example.mobilelocationapp.chart.RealPoint;
 import com.example.mobilelocationapp.chart.TargetPoint;
 import com.example.mobilelocationapp.fzy.MyService;
+import com.example.mobilelocationapp.utils.Tools;
 
+import org.achartengine.GraphicalView;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,6 +78,7 @@ public class SecondActivity extends AppCompatActivity{
     public static final String CAR_LISTS = "carLists";
     private int controlledCarNum;
     private CarList[] carLists;////误差数据
+    private List<Double> xList;
 
     //广播的action
     public static final String GET_1102 = "get1102";
@@ -81,6 +104,10 @@ public class SecondActivity extends AppCompatActivity{
     //按钮
     private Button btn_offOnSystem, btn_stopEmergency, btn_detail;
     private boolean isSystemOn = false;
+
+    private LinearLayout lLayout_X_Error, lLayout_Y_Error;//存放表格的线性布局
+    private GraphicalView XView, YView;//X，Y图表
+    private ChartService XService, YService;
 
     private Boolean myBound = false;
     private MyService.MyBinder myBinder;
@@ -110,6 +137,10 @@ public class SecondActivity extends AppCompatActivity{
         initView();
 
         setSeekBar();
+
+        test();
+
+        setChart();
 
         setCar();
 
@@ -172,6 +203,10 @@ public class SecondActivity extends AppCompatActivity{
 
         //小车
         rLayout = findViewById(R.id.rLayout);
+
+        //布局
+        lLayout_X_Error = findViewById(R.id.llayout_X_error);
+        lLayout_Y_Error = findViewById(R.id.llayout_Y_error);
     }
 
     //拖动
@@ -215,8 +250,8 @@ public class SecondActivity extends AppCompatActivity{
         seekBar_time.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                num_speed = i / 10 * speed;
-                tv_time.setText(num_speed + " s");
+                num_speed = i / 10.0 * speed;
+                tv_time.setText(num_speed + " m/s");
             }
 
             @Override
@@ -236,6 +271,7 @@ public class SecondActivity extends AppCompatActivity{
         btn_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String cmd = StOP + " " + down_acc + ENTER;
                 // 发送停车指令
                 myBinder.sendMessageBind(cmd, 0, mContext);
@@ -455,6 +491,155 @@ public class SecondActivity extends AppCompatActivity{
 
             }
 
+        }
+    }
+
+    public void test(){
+        carLists = new CarList[2];
+
+        carLists[0] = new CarList(1102);
+        carLists[1] = new CarList(1103);
+
+        for (int i = 0; i < 10; i++) {
+            double x = Math.random() * 4 + 1;
+            Random random = new Random(1000000202);
+            double y = random.nextDouble();
+
+
+            carLists[0].addRealPoint(x, y);
+            carLists[0].addTargetPoint(x, y);
+
+            carLists[1].addRealPoint(x, y);
+            carLists[1].addTargetPoint(x, y);
+        }
+
+        xList = new ArrayList<>();
+        for (int i = 0; i < carLists[0].getXError().size(); i++) {
+            xList.add(i * 1.0);
+        }
+    }
+
+    public void setChart(){
+        //误差曲线
+        XService = new ChartService(this);
+        XService.setMultipleSeriesDataset("从车一实时误差");
+        XService.setMultipleSeriesRenderer(50, 5, "x轴实时误差", "时间", "误差",
+                Color.RED, Color.RED, Color.RED, Color.BLACK);
+        XView = XService.getGraphicalView();
+
+        YService = new ChartService(this);
+        YService.setMultipleSeriesDataset("Y轴实时误差");
+        YService.setMultipleSeriesRenderer(50, 5, "y轴实时误差", "时间", "误差",
+                Color.RED, Color.RED, Color.RED, Color.BLACK);
+        YView = YService.getGraphicalView();
+
+        lLayout_X_Error.addView(XView);
+        lLayout_Y_Error.addView(YView);
+
+//        XService.updateChart(xList, carLists[0].getXError());
+//        YService.updateChart(xList, carLists[0].getYError());
+
+//        timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                handler.sendMessage(handler.obtainMessage());
+//            }
+//        }, 10, 1000);
+
+    }
+
+    private int t = 0;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            XService.updateChart(t, Math.random() * 10 - 5);
+            YService.updateChart(t, Math.random() * 10 - 5);
+            t += 1;
+        }
+    };
+
+    public String setDir(Activity activity){
+        String path = "";
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){//有sd卡
+            path = Environment.getExternalStorageDirectory() + "/";
+        }else {
+            path = Environment.getDataDirectory() + "/";
+        }
+
+        path = path + "com.carData/";
+
+        Tools.verifyStoragePermissions(SecondActivity.this);//请求写入的权限
+
+        createDir(path);//创建文件夹
+
+        return path;//返回绝对路径, /storage/emulated/0/com.carData
+    }
+
+    public boolean createDir(String path){
+        File dir = new File(path);
+        if (!dir.exists() || !dir.isDirectory()){
+            boolean isCreate = dir.mkdir();
+            return  isCreate;
+        }
+
+        return true;
+    }
+
+    public boolean saveFile(String path){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss");
+        Date date = new Date();
+        String fileName = dateFormat.format(date) + ".dat";
+
+        File file = new File(path, fileName);
+
+        try (
+                BufferedWriter out = new BufferedWriter(
+                        new OutputStreamWriter(
+                                new FileOutputStream(file), "UTF-8"));
+        ) {
+            for (int i = 0; i < carLists.length; i++) {
+                out.write(carLists[i].getPort() + "\r\n");
+                out.write("RealDate: ");
+
+                for (Iterator<RealPoint> iterator = carLists[i].getRealPointList().iterator(); iterator.hasNext(); ) {
+                    String s = iterator.next().toString();
+                    out.write(s);
+                    out.write(" ");
+                }
+
+                out.write("\r\n");
+                out.write("Target: ");
+                for (Iterator<TargetPoint> iterator = carLists[i].getTargetPointList().iterator(); iterator.hasNext(); ) {
+                    String s = iterator.next().toString();
+                    out.write(s);
+                    out.write(" ");
+                }
+
+                out.write("\r\n");
+                out.write("XError: ");
+                for (Double d: carLists[i].getXError()) {
+                    out.write(d + " ");
+                }
+
+                out.write("\r\n");
+                out.write("YError: ");
+                for (Double d: carLists[i].getYError()) {
+                    out.write(d + " ");
+                }
+
+                out.write("\r\n");
+                out.write("\r\n");
+            }
+
+            return true;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

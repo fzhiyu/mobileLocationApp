@@ -75,14 +75,14 @@ public class ChartService {
         multipleSeriesRenderer.setXTitle(xTitle);
         multipleSeriesRenderer.setYTitle(yTitle);//设置X,Y轴的标题
 
-        multipleSeriesRenderer.setRange(new double[]{0, maxX, 0, maxY});//xy轴的范围
-
         multipleSeriesRenderer.setLabelsColor(labelColor);//设置标题颜色
 
-        multipleSeriesRenderer.setXLabels(10);
-        multipleSeriesRenderer.setYLabels(10);//设置X,Y轴的间距大小
+        //multipleSeriesRenderer.setRange(new double[]{0, maxX, -maxY, maxY});//xy轴的范围
 
-        multipleSeriesRenderer.setXLabelsAlign(Paint.Align.RIGHT);
+        multipleSeriesRenderer.setXLabels(50);
+        multipleSeriesRenderer.setYLabels(10);//设置X,Y轴的标记数
+
+        multipleSeriesRenderer.setXLabelsAlign(Paint.Align.CENTER);
         multipleSeriesRenderer.setYLabelsAlign(Paint.Align.RIGHT);//不知道是啥
 
         multipleSeriesRenderer.setAxisTitleTextSize(20);//设置轴文字大小
@@ -96,7 +96,8 @@ public class ChartService {
 
         multipleSeriesRenderer.setMargins(new int[]{20, 30, 15, 20});//设定边距
 
-        multipleSeriesRenderer.setShowGrid(true);//显示网格
+        //multipleSeriesRenderer.setShowGrid(true);//显示网格
+        multipleSeriesRenderer.setShowGridX(true);
 
         multipleSeriesRenderer.setZoomEnabled(true, false);//缩放功能，X运行，Y不允许
         multipleSeriesRenderer.setPanEnabled(true, false);//拖动功能, X,Y

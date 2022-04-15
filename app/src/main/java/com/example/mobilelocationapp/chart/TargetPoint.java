@@ -1,30 +1,33 @@
 package com.example.mobilelocationapp.chart;
 
+import com.example.mobilelocationapp.utils.Tools;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class TargetPoint implements Serializable {
 
-    private Double X;
-    private Double Y;
+    private double x;
+    private double y;
 
-    public TargetPoint(Double x, Double y) {
-        this.X = x;
-        this.Y = y;
+    public TargetPoint(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public Double getX() {
-        return X;
+    public double getX() {
+        //保留小数点后三位
+        return Tools.formatDecimal(x, 3);
     }
 
-    public void setX(Double x) {
-        X = x;
+    public double getY() {
+        return Tools.formatDecimal(y, 3);
     }
 
-    public Double getY() {
-        return Y;
+    @Override
+    public String toString() {
+        return "(" + getX() + " , " + getY() + ")";
     }
 
-    public void setY(Double y) {
-        Y = y;
-    }
+
 }
