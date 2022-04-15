@@ -547,9 +547,9 @@ public class MainActivity2 extends AppCompatActivity {
             //画比例尺
             paint.setTextSize(textSize);
             paint.setStyle(Paint.Style.FILL);
-            canvas.drawText("1格 : 0.5米", ViewWidth - 300, 100, paint);
+            canvas.drawText("1格 : 0.5米", ViewWidth -300, 400, paint);
             //画一
-            canvas.drawText("主", circleX + 10, circleY + 10, paint);
+            canvas.drawText("主", circleX + 10, circleY + 50, paint);
 
             paint.setStyle(Paint.Style.FILL);
         }

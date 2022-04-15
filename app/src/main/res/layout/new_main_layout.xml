@@ -23,104 +23,18 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/ip1" />
 
-        <RelativeLayout
-            android:id="@+id/layout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ip2">
-
-            <TextView
-                android:id="@+id/selectCar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="选择需要编队车辆:"
-                android:textColor="@color/black"
-                android:textStyle="italic" />
-
-            <TextView
-                android:id="@+id/car1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/selectCar"
-                android:text="从车一" />
-
-            <CheckBox
-                android:id="@+id/checkbox1"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_below="@id/selectCar"
-                android:layout_toEndOf="@+id/car1"
-                android:onClick="onCheckboxClicked" />
-
-            <TextView
-                android:id="@+id/car2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/selectCar"
-                android:layout_marginStart="10dp"
-                android:layout_toEndOf="@+id/checkbox1"
-                android:text="从车二" />
-
-            <CheckBox
-                android:id="@+id/checkbox2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/selectCar"
-                android:layout_alignBaseline="@+id/car2"
-                android:layout_toEndOf="@+id/car2"
-                android:onClick="onCheckboxClicked" />
-
-            <TextView
-                android:id="@+id/car3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/selectCar"
-                android:layout_toEndOf="@+id/checkbox2"
-                android:text="从车三" />
-
-            <CheckBox
-                android:id="@+id/checkbox3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/selectCar"
-                android:layout_alignBaseline="@+id/car2"
-                android:layout_toEndOf="@id/car3"
-                android:onClick="onCheckboxClicked" />
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/formTxt"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_below="@+id/checkbox1"-->
-            <!--                android:text="参与编队车辆:" />-->
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/masterCar"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_below="@id/formTxt"-->
-            <!--                android:text="主车  " />-->
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/formCar"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_below="@id/formTxt"-->
-            <!--                android:layout_marginStart="8dp"-->
-            <!--                android:layout_toEndOf="@+id/masterCar" />-->
-        </RelativeLayout>
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/layout1"/>
+            android:layout_below="@id/ip2" />
 
 
         <RelativeLayout
             android:id="@+id/layout2"
             android:layout_width="400dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/layout1"
+            android:layout_below="@id/ip2"
             android:layout_marginEnd="0dp">
 
             <TextView
@@ -279,6 +193,11 @@
 
         </RelativeLayout>
 
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout2" />
+
         <LinearLayout
             android:id="@+id/control"
             android:layout_width="match_parent"
@@ -360,7 +279,96 @@
         android:id="@+id/linearlayout"
         android:layout_width="fill_parent"
         android:layout_height="300dp"
-        android:layout_toEndOf="@+id/linearlayout1"
         android:layout_marginTop="50dp"
+        android:layout_toEndOf="@+id/linearlayout1"
         android:orientation="vertical" />
+
+    <RelativeLayout
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearlayout"
+        android:layout_toEndOf="@+id/linearlayout1"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/selectCar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择需要编队车辆:"
+            android:textColor="@color/black"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/car1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/selectCar"
+            android:text="从车一" />
+
+        <CheckBox
+            android:id="@+id/checkbox1"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_below="@id/selectCar"
+            android:layout_toEndOf="@+id/car1"
+            android:onClick="onCheckboxClicked" />
+
+        <TextView
+            android:id="@+id/car2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/selectCar"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/checkbox1"
+            android:text="从车二" />
+
+        <CheckBox
+            android:id="@+id/checkbox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/selectCar"
+            android:layout_alignBaseline="@+id/car2"
+            android:layout_toEndOf="@+id/car2"
+            android:onClick="onCheckboxClicked" />
+
+        <TextView
+            android:id="@+id/car3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/selectCar"
+            android:layout_toEndOf="@+id/checkbox2"
+            android:text="从车三" />
+
+        <CheckBox
+            android:id="@+id/checkbox3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/selectCar"
+            android:layout_alignBaseline="@+id/car2"
+            android:layout_toEndOf="@id/car3"
+            android:onClick="onCheckboxClicked" />
+
+        <!--            <TextView-->
+        <!--                android:id="@+id/formTxt"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_below="@+id/checkbox1"-->
+        <!--                android:text="参与编队车辆:" />-->
+
+        <!--            <TextView-->
+        <!--                android:id="@+id/masterCar"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_below="@id/formTxt"-->
+        <!--                android:text="主车  " />-->
+
+        <!--            <TextView-->
+        <!--                android:id="@+id/formCar"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_below="@id/formTxt"-->
+        <!--                android:layout_marginStart="8dp"-->
+        <!--                android:layout_toEndOf="@+id/masterCar" />-->
+    </RelativeLayout>
 </RelativeLayout>
