@@ -26,6 +26,7 @@ public class MyService extends Service {
     String[] status;
     String onLine = "在线";
     String offLine = "离线";
+    long[] heartTime = {0, 0, 0, 0};
 
     public class MyBinder extends Binder{
         public MyService getService() {
@@ -54,6 +55,15 @@ public class MyService extends Service {
         exec.execute(tcpSlaveServer1);
         exec.execute(tcpSlaveServer2);
         exec.execute(tcpSlaveServer3);
+    }
+
+    //获取最新心跳信息
+    public long[] getHeart() {
+        heartTime[0] = tcpMasterServer.getHeart();
+        heartTime[1] = tcpSlaveServer1.getHeart();
+        heartTime[2] = tcpSlaveServer2.getHeart();
+        heartTime[3] = tcpSlaveServer3.getHeart();
+        return heartTime;
     }
 
     //获取连接状态
@@ -89,6 +99,20 @@ public class MyService extends Service {
         return status;
     }
 
+    //接收关闭信息
+    public void closeSocket(int curr) {
+        switch (curr) {
+            case 0:
+                tcpMasterServer.closeSocket();
+            case 1:
+                tcpSlaveServer1.closeSocket();
+            case 2:
+                tcpSlaveServer2.closeSocket();
+            case 3:
+                tcpSlaveServer3.closeSocket();
+        }
+    }
+
     //发送信息
     private void sendMessage(String message, int currRadio, Context context) {
         switch (currRadio) {
@@ -114,7 +138,7 @@ public class MyService extends Service {
                 }
                 break;
             case 3:
-                if (tcpSlaveServer2.inputThread != null) {
+                if (tcpSlaveServer3.inputThread != null) {
                     exec.execute(() -> tcpSlaveServer3.inputThread.sendData(message));
                 } else {
                     Toast.makeText(context, "从车三未连接", Toast.LENGTH_SHORT).show();

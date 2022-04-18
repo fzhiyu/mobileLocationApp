@@ -28,6 +28,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
@@ -48,16 +49,16 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity2 extends AppCompatActivity {
-    float circleX;
-    float circleY;
+    private float circleX;
+    private float circleY;
     //坐标系位置
     float paintX;
     float paintY;
     //圆半径
-    int radius;
+    private int radius;
     //声明画笔
     private Canvas my_canvas;
-    Paint paint;
+    private Paint paint;
     //屏幕宽高
     int screenWidth;
     int screenHeight;
@@ -72,7 +73,7 @@ public class MainActivity2 extends AppCompatActivity {
     int bitmapX;
     int bitmapY;
     float textWidth = 3f;
-    float textSize = 40;
+    float textSize = 30;
     MyDrawView myDrawView;
     volatile MyService.MyBinder myBinder;
     MyService myService;
@@ -100,6 +101,10 @@ public class MainActivity2 extends AppCompatActivity {
     String ROTATER  = "ROTATER 1\r\n";
     String TLEFT  = "TLEFT 1\r\n";
     String TRIGHT  = "TRIGHT 1\r\n";
+    String StartFineTurn = "StartFineTurn\r\n";
+    String StopFineTurn = "StopFineTurn\r\n";
+    String StartFormation = "StartFormation\r\n";
+    String StopFormation = "StopFormation\r\n";
     //当前选择的radio
     int currRadio = 0;
     RadioButton radio1;
@@ -109,6 +114,10 @@ public class MainActivity2 extends AppCompatActivity {
     TextView txtCar2;
     TextView txtCar3;
     TextView txtCar4;
+    TextView current;
+    Button btnFineTurn;
+    ImageButton TLeft;
+    ImageButton TRight;
     String[] status = new String[4];
     //标志位
     int[] car_isChecked = new int[3];
@@ -120,24 +129,8 @@ public class MainActivity2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.new_main_layout);
-        //创建DrawView组件
-        myDrawView = new MyDrawView(this, null);
-        //获取布局文件里的linearlayout容器
-        linearLayout = findViewById(R.id.linearlayout);
-        linearLayout.addView(myDrawView);
 
-        nextPage = findViewById(R.id.nextPage);
-        txtIP = findViewById(R.id.ip2);
-        seekBar = findViewById(R.id.seekBar_speed);
-        speedTxt = findViewById(R.id.speedTxt2);
-//        formCar = findViewById(R.id.formCar);
-        radio1 = findViewById(R.id.radio1);
-        radio2 = findViewById(R.id.radio2);
-        radio3 = findViewById(R.id.radio3);
-        txtCar1 = findViewById(R.id.txt_car1);
-        txtCar2 = findViewById(R.id.txt_car2);
-        txtCar3 = findViewById(R.id.txt_car3);
-        txtCar4 = findViewById(R.id.txt_car4);
+        init();
 
         //显示IP地址
         txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
@@ -147,7 +140,6 @@ public class MainActivity2 extends AppCompatActivity {
         speedTxt.setText(speed + "m/s");
 
         //获取view的长宽
-        linearLayout = findViewById(R.id.linearlayout);
         ViewTreeObserver observer = linearLayout.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -171,8 +163,8 @@ public class MainActivity2 extends AppCompatActivity {
         Log.e(TAG, "BindService: " + myBinder );
 
         //启动1s后建立tcp连接
-       Handler handler = new Handler();
-        Runnable runnable = new Runnable(){
+        Handler handler = new Handler();
+        Runnable runnable1 = new Runnable(){
             @Override
             public void run() {
                 // TODO Auto-generated method stub
@@ -185,23 +177,38 @@ public class MainActivity2 extends AppCompatActivity {
                 handler.removeCallbacks(this);
             }
         };
-        handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
+        handler.postDelayed(runnable1, 400);// 打开定时器，50ms后执行runnable操作
 
         //创建定时器检测连接状态
         detectConnect();
 
-        //跳转下一页
-        nextPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity2.this, SecondActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
         //控制速度进度条
         controlSpeed();
+    }
+
+    private void init() {
+        linearLayout = findViewById(R.id.linearlayout);
+        //创建DrawView组件
+        myDrawView = new MyDrawView(this, null);
+        //获取布局文件里的linearlayout容器
+        linearLayout.addView(myDrawView);
+
+        nextPage = findViewById(R.id.StartFormation);
+        txtIP = findViewById(R.id.ip2);
+        seekBar = findViewById(R.id.seekBar_speed);
+        speedTxt = findViewById(R.id.speedTxt2);
+//        formCar = findViewById(R.id.formCar);
+        radio1 = findViewById(R.id.radio1);
+        radio2 = findViewById(R.id.radio2);
+        radio3 = findViewById(R.id.radio3);
+        txtCar1 = findViewById(R.id.txt_car1);
+        txtCar2 = findViewById(R.id.txt_car2);
+        txtCar3 = findViewById(R.id.txt_car3);
+        txtCar4 = findViewById(R.id.txt_car4);
+        current = findViewById(R.id.current2);
+        btnFineTurn = findViewById(R.id.fineTurn);
+        TLeft = findViewById(R.id.TLeft);
+        TRight = findViewById(R.id.TRight);
     }
 
     //检测连接状态
@@ -211,6 +218,7 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public void run() {
                 if (myService != null) {
+                    //设置在线和离线状态
                     status = myService.getStatus();
                     String curr1 = String.valueOf(txtCar1.getText());
                     if (!curr1.equals(status[0]) && status[0].equals("在线")) {
@@ -220,29 +228,57 @@ public class MainActivity2 extends AppCompatActivity {
                         txtCar1.setText(status[0]);
                         txtCar1.setTextColor(Color.BLACK);
                     }
-                    if (!String.valueOf(txtCar2.getText()).equals(status[1]) && status[1].equals("在线")) {
+                    if (status[1].equals("在线")) {
                         txtCar2.setText(status[1]);
                         txtCar2.setTextColor(Color.RED);
-                    } else if (!String.valueOf(txtCar1.getText()).equals(status[1]) && status[1].equals("离线")) {
+                    } else if (status[1].equals("离线")) {
                         txtCar2.setText(status[1]);
                         txtCar2.setTextColor(Color.BLACK);
                     }
-                    if (!String.valueOf(txtCar3.getText()).equals(status[2]) && status[2].equals("在线")) {
+                    if (status[2].equals("在线")) {
                         txtCar3.setText(status[2]);
                         txtCar3.setTextColor(Color.RED);
-                    } else if (!String.valueOf(txtCar1.getText()).equals(status[2]) && status[2].equals("离线")) {
+                    } else if (status[2].equals("离线")) {
                         txtCar3.setText(status[2]);
                         txtCar3.setTextColor(Color.BLACK);
                     }
-                    if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("在线")) {
+                    if (status[3].equals("在线")) {
                         txtCar4.setText(status[3]);
                         txtCar4.setTextColor(Color.RED);
-                    } else if (!String.valueOf(txtCar4.getText()).equals(status[3]) && status[3].equals("离线")) {
+                    } else if (status[3].equals("离线")) {
                         txtCar4.setText(status[3]);
                         txtCar4.setTextColor(Color.BLACK);
                     }
+
+                    //在离线情况下将图上离线的点设为黑色
+                    for (Car car : cars) {
+                        if (status[car.getPort() - 1101].equals("离线")) {
+                            erasePoint(car.getPort());
+                        }
+                    }
+
+                    //处理连接异常,如果超过2.5秒没有收到心跳信息，就将连接关闭，并改变状态
+//                    long[] heartTime = myService.getHeart();
+//                    long curr = System.currentTimeMillis();
+//                    for (int i = 0; i < 4; i++) {
+//                        if (heartTime[i] != 0 && curr - heartTime[i] > 2500) {
+//                            switch (i) {
+//                                case 0:
+//                                    txtCar1.setTextColor(Color.BLACK);
+//                                case 1:
+//                                    txtCar2.setTextColor(Color.BLACK);
+//                                case 2:
+//                                    txtCar3.setTextColor(Color.BLACK);
+//                                case 3:
+//                                    txtCar4.setTextColor(Color.BLACK);
+//                            }
+//                            //关闭socket
+//                            myService.closeSocket(i);
+//                        }
+//                    }
+//                    Log.e(TAG, "run: " + status[3] );
                 }
-                handler.postDelayed(this, 1000);// 50ms后执行this，即runable
+                handler.postDelayed(this, 500);// 50ms后执行this，即runable
             }
         };
         handler.postDelayed(runnable, 1000);// 打开定时器，50ms后执行runnable操作
@@ -252,6 +288,12 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onDestroy() {
         unbindService(connection);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e(TAG, "onResume: " );
     }
 
     private void controlSpeed() {
@@ -357,24 +399,60 @@ public class MainActivity2 extends AppCompatActivity {
 //        formCar.setText(stringBuilder);
     }
 
+    public void StartFormation(View view) {
+        myBinder.sendMessageBind(StartFormation, currRadio, getApplicationContext());
+        Intent intent = new Intent(MainActivity2.this, SecondActivity.class);
+        startActivity(intent);
+    }
+
     public void sendStop(View view) {
-        myBinder.sendMessageBind("STOP 1\r\n", currRadio, getApplicationContext());
+        myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
     }
 
     public void sendUp(View view) {
-        myBinder.sendMessageBind("UP 1 2\r\n", currRadio, getApplicationContext());
+        myBinder.sendMessageBind(UP, currRadio, getApplicationContext());
     }
 
     public void sendDown(View view) {
-        myBinder.sendMessageBind("DOWN 1 2\r\n", currRadio, getApplicationContext());
+        myBinder.sendMessageBind(DOWN, currRadio, getApplicationContext());
     }
 
     public void sendLeft(View view) {
-        myBinder.sendMessageBind("LEFT 1 2\r\n", currRadio, getApplicationContext());
+        myBinder.sendMessageBind(LEFT, currRadio, getApplicationContext());
     }
 
     public void sendRight(View view) {
-        myBinder.sendMessageBind("RIGHT 1 2\r\n", currRadio, getApplicationContext());
+        myBinder.sendMessageBind(RIGHT, currRadio, getApplicationContext());
+    }
+
+    public void sendRotateLeft(View view) {
+        myBinder.sendMessageBind(ROTATEL, currRadio, getApplicationContext());
+    }
+
+    public void sendRotateRight(View view) {
+        myBinder.sendMessageBind(ROTATER, currRadio, getApplicationContext());
+    }
+
+    public void fineTurn(View view) {
+        if (btnFineTurn.getText().equals("关闭微调")) {
+            TLeft.setEnabled(false);
+            TRight.setEnabled(false);
+            btnFineTurn.setText("开启微调");
+            myBinder.sendMessageBind(StopFineTurn, currRadio, getApplicationContext());
+        } else {
+            TLeft.setEnabled(true);
+            TRight.setEnabled(true);
+            btnFineTurn.setText("关闭微调");
+            myBinder.sendMessageBind(StartFineTurn, currRadio, getApplicationContext());
+        }
+    }
+
+    public void sendTRight(View view) {
+        myBinder.sendMessageBind(TRIGHT, currRadio, getApplicationContext());
+    }
+
+    public void sendTLeft(View view) {
+        myBinder.sendMessageBind(TLEFT, currRadio, getApplicationContext());
     }
 
     public void onRadioButtonClicked(View view) {
@@ -387,29 +465,32 @@ public class MainActivity2 extends AppCompatActivity {
                 if (checked) {
                     currRadio = 0;
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+
                 }
                 break;
             case R.id.radio1:
                 if (checked) {
                     currRadio = 1;
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+                    current.setText("从车一");
                 }
                     break;
             case R.id.radio2:
                 if (checked) {
                     currRadio = 2;
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+                    current.setText("从车二");
                 }
                     break;
             case R.id.radio3:
                 if (checked) {
                     currRadio = 3;
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
+                    current.setText("从车三");
                 }
                     break;
         }
     }
-
 
     private class MyBroadcast extends BroadcastReceiver {
         @Override
@@ -423,6 +504,7 @@ public class MainActivity2 extends AppCompatActivity {
                 if (car_isChecked[port - 1102] == 1) {
                     drawPoint(port, message);
                 }
+
             }
         }
     }
@@ -442,7 +524,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     //画点
     private void drawPoint(int port, String message) {
-        Log.e(TAG, "onReceive: " + port + " " + System.currentTimeMillis());
+//        Log.e(TAG, "onReceive: " + port + " " + System.currentTimeMillis());
         String[] messageData = message.split(" ");
         Car update_car = new Car();
 
@@ -450,6 +532,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         paintX = Float.parseFloat(messageData[1]) * 100 + circleX;
         paintY = Float.parseFloat(messageData[2]) * 100 + circleY;
+//        Log.e(TAG, "drawPoint: " + paintX + ", " + paintY );
         //存储数据，每次画新点之前，将旧点抹去
         update_car.setX(paintX);
         update_car.setY(paintY);
@@ -495,7 +578,6 @@ public class MainActivity2 extends AppCompatActivity {
             //设置位图颜色
             bitmap.eraseColor(Color.WHITE);
             my_canvas = new Canvas(bitmap);
-
         }
 
         @Override
@@ -503,14 +585,15 @@ public class MainActivity2 extends AppCompatActivity {
             super.onDraw(canvas);
 
             //位图的左上角坐标
-            bitmapX = screenWidth - linearLayout.getLeft() - ViewWidth;
+//            bitmapX = screenWidth - linearLayout.getLeft() - ViewWidth;
+            bitmapX = 0;
             bitmapY = 0;
             //圆心的坐标
-            circleX = bitmapX + (float) ViewWidth / 2;
+            circleX = (float) ViewWidth / 2;
 //            circleY = (float) ViewHeight / 2;
             circleY = 0;
             //圆半径
-            radius = 450;
+            radius = 550;
 
             //设置直线的起始点
             float lineStartX = circleX - radius;
@@ -539,6 +622,16 @@ public class MainActivity2 extends AppCompatActivity {
             canvas.drawCircle(circleX, circleY, 350, paint);
             canvas.drawCircle(circleX, circleY, 400, paint);
             canvas.drawCircle(circleX, circleY, 450, paint);
+            canvas.drawCircle(circleX, circleY, 500, paint);
+            canvas.drawCircle(circleX, circleY, 550, paint);
+            Paint paint2 = new Paint();
+            paint2.setColor(Color.BLACK);
+            paint2.setTextSize(30);
+            canvas.drawText("1m", circleX - 30, 95, paint2);
+            canvas.drawText("2m", circleX - 30, 195, paint2);
+            canvas.drawText("3m", circleX - 30, 295, paint2);
+            canvas.drawText("4m", circleX - 30, 395, paint2);
+            canvas.drawText("5m", circleX - 30, 495, paint2);
             //画直线
             canvas.drawLine(lineStartX, circleY, lineEndX, circleY, paint);
             float lineStartY = circleY - radius;
@@ -547,11 +640,14 @@ public class MainActivity2 extends AppCompatActivity {
             //画比例尺
             paint.setTextSize(textSize);
             paint.setStyle(Paint.Style.FILL);
-            canvas.drawText("1格 : 0.5米", ViewWidth -300, 400, paint);
+//            canvas.drawText("1格 : 0.5米", ViewWidth -300, 400, paint);
             //画一
-            canvas.drawText("主", circleX + 10, circleY + 50, paint);
+            canvas.drawText("主", circleX + 10, circleY + 30, paint);
 
             paint.setStyle(Paint.Style.FILL);
+
+            paint.setStrokeWidth(20f);
+//            my_canvas.drawPoint(10, 10, paint);
         }
 
         @Override
@@ -563,7 +659,7 @@ public class MainActivity2 extends AppCompatActivity {
         public void drawPoint(String name) {
             paint.setStrokeWidth(10f);
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(Color.BLACK);
+            paint.setColor(Color.RED);
             my_canvas.drawPoint(paintX, paintY, paint);
             my_canvas.drawText(name, paintX + 10, paintY + 10, paint);
             invalidate();

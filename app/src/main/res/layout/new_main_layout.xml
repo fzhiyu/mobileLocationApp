@@ -11,6 +11,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
+
         <TextView
             android:id="@+id/ip1"
             android:layout_width="wrap_content"
@@ -35,7 +37,8 @@
             android:layout_width="400dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/ip2"
-            android:layout_marginEnd="0dp">
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:id="@+id/selectCar2"
@@ -198,177 +201,313 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/layout2" />
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/control"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:layout_below="@+id/layout2"
-            android:gravity="center">
+            android:layout_below="@+id/layout2">
 
-            <LinearLayout
+            <!-- 转台微调           -->
+            <RelativeLayout
+                android:id="@+id/turn"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="wrap_content">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/current1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="当前转台: " />
 
-                    <Button
-                        android:id="@+id/btn_stop"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/round_button"
-                        android:onClick="sendStop"
-                        android:text="STOP" />
+                <TextView
+                    android:id="@+id/current2"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/current1"
+                    android:text="未选择"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
 
-                    <ImageButton
-                        android:id="@+id/ibtn_up"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@id/btn_stop"
-                        android:layout_centerHorizontal="true"
-                        android:background="@color/white"
-                        android:onClick="sendUp"
-                        app:srcCompat="@drawable/ic_up" />
+                <TextView
+                    android:id="@+id/turn_angle1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/current2"
+                    android:text="当前转台角度:" />
 
+                <TextView
+                    android:id="@+id/turn_angle2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/turn_angle1"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
 
-                    <ImageButton
-                        android:id="@+id/ibtn_down"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/btn_stop"
-                        android:layout_centerHorizontal="true"
-                        android:background="@color/white"
-                        android:onClick="sendDown"
-                        app:srcCompat="@drawable/ic_down" />
-
-                    <ImageButton
-                        android:id="@+id/ibtn_left"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toLeftOf="@+id/btn_stop"
-                        android:background="@color/white"
-                        android:onClick="sendLeft"
-                        android:src="@drawable/ic_left" />
-
-                    <ImageButton
-                        android:id="@+id/ibtn_right"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/btn_stop"
-                        android:background="@color/white"
-                        android:onClick="sendRight"
-                        android:src="@drawable/ic_right" />
-                </RelativeLayout>
-            </LinearLayout>
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/txt_turn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/current1"
+                    android:layout_alignBaseline="@+id/fineTurn"
+                    android:text="控制转台："
+                    android:textStyle="bold" />
 
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/nextPage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:text="开始编队" />
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/TLeft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/turn_angle1"
+                    android:layout_toEndOf="@+id/txt_turn"
+                    android:background="@color/white"
+                    android:onClick="sendTLeft"
+                    android:padding="0dp"
+                    android:paddingBottom="0dp"
+                    android:src="@drawable/ic_left2" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/fineTurn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/turn_angle1"
+                    android:layout_marginTop="2dp"
+                    android:layout_toEndOf="@+id/TLeft"
+                    android:onClick="fineTurn"
+                    android:text="开启微调" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/TRight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/turn_angle1"
+                    android:layout_toEndOf="@+id/fineTurn"
+                    android:background="@color/white"
+                    android:onClick="sendTRight"
+                    android:padding="0dp"
+                    android:paddingBottom="0dp"
+                    android:src="@drawable/ic_right2" />
+
+            </RelativeLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/turn" />
+
+            <TextView
+                android:id="@+id/txt_turn2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/turn"
+                android:layout_marginTop="10dp"
+                android:text="控制方向:"
+                android:textSize="30px"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:id="@+id/wheel"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_alignParentBottom="true">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_toStartOf="@+id/ibtn_up"
+                    android:background="@color/white"
+                    android:onClick="sendRotateLeft"
+                    android:src="@drawable/ic_baseline_rotate_left_24" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_toEndOf="@+id/ibtn_up"
+                    android:background="@color/white"
+                    android:onClick="sendRotateRight"
+                    android:src="@drawable/ic_baseline_rotate_right_24" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/round_button"
+                    android:onClick="sendStop"
+                    android:text="@string/stop"
+                    android:textAppearance="?android:textAppearanceLarge"/>
+
+                <ImageButton
+                    android:id="@+id/ibtn_up"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/btn_stop"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/white"
+                    android:onClick="sendUp"
+                    app:srcCompat="@drawable/ic_up" />
+
+                <ImageButton
+                    android:id="@+id/ibtn_down"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btn_stop"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/white"
+                    android:onClick="sendDown"
+                    app:srcCompat="@drawable/ic_down" />
+
+                <ImageButton
+                    android:id="@+id/ibtn_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/btn_stop"
+                    android:background="@color/white"
+                    android:onClick="sendLeft"
+                    android:src="@drawable/ic_left" />
+
+                <ImageButton
+                    android:id="@+id/ibtn_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/btn_stop"
+                    android:background="@color/white"
+                    android:onClick="sendRight"
+                    android:src="@drawable/ic_right" />
+            </RelativeLayout>
+        </RelativeLayout>
+
     </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/linearlayout"
-        android:layout_width="fill_parent"
-        android:layout_height="300dp"
-        android:layout_marginTop="50dp"
-        android:layout_toEndOf="@+id/linearlayout1"
-        android:orientation="vertical" />
 
     <RelativeLayout
-        android:id="@+id/layout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/linearlayout"
-        android:layout_toEndOf="@+id/linearlayout1"
-        android:layout_alignParentBottom="true">
+        android:id="@+id/layout5"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@+id/linearlayout1">
 
-        <TextView
-            android:id="@+id/selectCar"
+        <LinearLayout
+            android:id="@+id/linearlayout"
+            android:layout_width="fill_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="50dp"
+            android:orientation="vertical" />
+
+        <com.google.android.material.divider.MaterialDivider
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择需要编队车辆:"
-            android:textColor="@color/black"
-            android:textStyle="italic" />
+            android:layout_below="@id/linearlayout" />
 
-        <TextView
-            android:id="@+id/car1"
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/gray" />
+
+        <RelativeLayout
+            android:id="@+id/layout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearlayout"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="50dp">
+
+            <TextView
+                android:id="@+id/selectCar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择需要编队车辆:"
+                android:textColor="@color/black"
+                android:textSize="35px"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/car1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar"
+                android:text="从车一" />
+
+            <CheckBox
+                android:id="@+id/checkbox1"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_below="@id/selectCar"
+                android:layout_toEndOf="@+id/car1"
+                android:onClick="onCheckboxClicked" />
+
+            <TextView
+                android:id="@+id/car2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/checkbox1"
+                android:text="从车二" />
+
+            <CheckBox
+                android:id="@+id/checkbox2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar"
+                android:layout_alignBaseline="@+id/car2"
+                android:layout_toEndOf="@+id/car2"
+                android:onClick="onCheckboxClicked" />
+
+            <TextView
+                android:id="@+id/car3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar"
+                android:layout_toEndOf="@+id/checkbox2"
+                android:text="从车三" />
+
+            <CheckBox
+                android:id="@+id/checkbox3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/selectCar"
+                android:layout_alignBaseline="@+id/car2"
+                android:layout_toEndOf="@id/car3"
+                android:onClick="onCheckboxClicked" />
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/formTxt"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_below="@+id/checkbox1"-->
+            <!--                android:text="参与编队车辆:" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/masterCar"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_below="@id/formTxt"-->
+            <!--                android:text="主车  " />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/formCar"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_below="@id/formTxt"-->
+            <!--                android:layout_marginStart="8dp"-->
+            <!--                android:layout_toEndOf="@+id/masterCar" />-->
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/StartFormation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:text="从车一" />
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="10dp"
+            android:onClick="StartFormation"
+            android:text="开始编队" />
 
-        <CheckBox
-            android:id="@+id/checkbox1"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_below="@id/selectCar"
-            android:layout_toEndOf="@+id/car1"
-            android:onClick="onCheckboxClicked" />
-
-        <TextView
-            android:id="@+id/car2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/checkbox1"
-            android:text="从车二" />
-
-        <CheckBox
-            android:id="@+id/checkbox2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_alignBaseline="@+id/car2"
-            android:layout_toEndOf="@+id/car2"
-            android:onClick="onCheckboxClicked" />
-
-        <TextView
-            android:id="@+id/car3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_toEndOf="@+id/checkbox2"
-            android:text="从车三" />
-
-        <CheckBox
-            android:id="@+id/checkbox3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/selectCar"
-            android:layout_alignBaseline="@+id/car2"
-            android:layout_toEndOf="@id/car3"
-            android:onClick="onCheckboxClicked" />
-
-        <!--            <TextView-->
-        <!--                android:id="@+id/formTxt"-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_below="@+id/checkbox1"-->
-        <!--                android:text="参与编队车辆:" />-->
-
-        <!--            <TextView-->
-        <!--                android:id="@+id/masterCar"-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_below="@id/formTxt"-->
-        <!--                android:text="主车  " />-->
-
-        <!--            <TextView-->
-        <!--                android:id="@+id/formCar"-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_below="@id/formTxt"-->
-        <!--                android:layout_marginStart="8dp"-->
-        <!--                android:layout_toEndOf="@+id/masterCar" />-->
     </RelativeLayout>
+
 </RelativeLayout>

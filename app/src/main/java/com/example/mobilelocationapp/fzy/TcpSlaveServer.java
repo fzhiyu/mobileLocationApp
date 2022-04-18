@@ -4,6 +4,7 @@ import static android.service.controls.ControlsProviderService.TAG;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 public class TcpSlaveServer implements Runnable{
 
@@ -34,6 +36,8 @@ public class TcpSlaveServer implements Runnable{
     private PrintWriter printWriter;
     ServerSocket serverSocket;
     Socket socket;
+    boolean flag = false;
+    long currHeart = 0;
 
     public TcpSlaveServer(int port, Context context) {
         this.host = host;
@@ -46,12 +50,13 @@ public class TcpSlaveServer implements Runnable{
     public boolean getStatus() {
         boolean status;
         if (socket != null) {
+            // 在线为true, 离线为false
             status = !socket.isClosed();
-//            Log.e(TAG, "getStatus: " + status );
+//            Log.e(TAG, "getStatus: " + flag );
         } else {
             status = false;
         }
-        return status;
+        return flag;
     }
 
     @Override
@@ -80,11 +85,20 @@ public class TcpSlaveServer implements Runnable{
         }
     }
 
+    //获取最新的心跳的时间
+    public long getHeart() {
+        return currHeart;
+    }
+
+    //关闭socket
+    public void closeSocket() {
+        flag = false;
+    }
+
     //线程 处理输入
     public class InputThread extends Thread{
         private final Socket socket;
-        private Context context;
-        private InputStream inputStream;
+        private final Context context;
 
         InputThread(Socket socket, Context context) {
             this.socket = socket;
@@ -92,7 +106,7 @@ public class TcpSlaveServer implements Runnable{
 
             try {
                 OutputStream outputStream = socket.getOutputStream();
-                inputStream = socket.getInputStream();
+                InputStream inputStream = socket.getInputStream();
                 printWriter = new PrintWriter(outputStream, true);
                 br = new BufferedReader(new InputStreamReader(inputStream));
                 start();
@@ -110,23 +124,42 @@ public class TcpSlaveServer implements Runnable{
 
         @Override
         public void run() {
-            boolean flag = true;
+            process();
 
+            try {
+                socket.close();
+                flag = false;
+                Log.e(TAG, "run: 与从车客户端断开连接" );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            super.run();
+        }
+
+        private void process() {
+            flag = true;
             while (!socket.isClosed() && flag) {
                 String str = null;
                 try {
+                    socket.setSoTimeout(5000);
                     str = br.readLine();
                 } catch (IOException e) {
+                    flag = false;
                     try {
                         br.close();
+//                        flag = false;
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
                     }
                     e.printStackTrace();
                 }
                 if (str != null && str.equals("AT+CIPSTATUS")) {
-                    Log.e(TAG, "run: " + str );
+                    currHeart = System.currentTimeMillis();
+                    //                    Log.e(TAG, "run: " + str );
                     inputThread.sendData("OK\r\n");
+                }
+                if (System.currentTimeMillis() - currHeart > 2500) {
+                    flag = false;
                 }
                 if (str != null && str.charAt(0) == 'V') {
                     Intent intent = new Intent();
@@ -137,10 +170,10 @@ public class TcpSlaveServer implements Runnable{
                     context.sendBroadcast(intent);
                 }
 
-                if (str != null && !str.equals("")){
+                if (str != null && !str.equals("")) {
                     String[] strings = str.split(" "); //将字符串切分开
 
-                    if (strings[0].compareToIgnoreCase("target") == 0){//收到类型为target的消息
+                    if (strings[0].compareToIgnoreCase("target") == 0) {//收到类型为target的消息
                         Intent intent = new Intent();
                         String action = "get" + port;
                         intent.setAction(action);
@@ -150,14 +183,6 @@ public class TcpSlaveServer implements Runnable{
                     }
                 }
             }
-
-            try {
-                socket.close();
-                Log.e(TAG, "run: 从车服务器关闭" );
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            super.run();
         }
     }
 
