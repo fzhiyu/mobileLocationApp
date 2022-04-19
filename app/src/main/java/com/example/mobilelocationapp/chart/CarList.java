@@ -65,4 +65,9 @@ public class CarList implements Serializable {
         return realPointList.isEmpty() || targetPointList.isEmpty();
     }
 
+    public void clear(){
+        realPointList.clear();
+        targetPointList.clear();
+    }
+
 }

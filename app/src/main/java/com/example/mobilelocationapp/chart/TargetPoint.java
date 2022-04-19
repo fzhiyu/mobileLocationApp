@@ -4,11 +4,13 @@ import com.example.mobilelocationapp.utils.Tools;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 public class TargetPoint implements Serializable {
 
     private double x;
     private double y;
+    private DecimalFormat df = new DecimalFormat("0.000");
 
     public TargetPoint(double x, double y) {
         this.x = x;

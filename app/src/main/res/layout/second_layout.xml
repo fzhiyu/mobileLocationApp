@@ -19,6 +19,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
             android:orientation="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -28,7 +30,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="加速加速度"/>
+                    android:text="加速加速度"
+                    android:gravity="center"/>
                 <SeekBar
                     android:id="@+id/seekBar_up"
                     android:layout_width="0dp"
@@ -41,7 +44,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="0.5 m/s²"/>
+                    android:text="0.5 m/s²"
+                    android:gravity="center"/>
 
             </LinearLayout>
 
@@ -53,7 +57,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="车最大速度"/>
+                    android:text="车最大速度"
+                    android:gravity="center"/>
                 <SeekBar
                     android:id="@+id/seekBar_time"
                     android:layout_width="0dp"
@@ -66,7 +71,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="0.5 m/s"/>
+                    android:text="0.5 m/s"
+                    android:gravity="center"/>
 
             </LinearLayout>
 
@@ -78,7 +84,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="减速减速度"/>
+                    android:text="减速减速度"
+                    android:gravity="center"/>
                 <SeekBar
                     android:id="@+id/seekBar_down"
                     android:layout_width="0dp"
@@ -91,7 +98,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="0.5 m/s²"/>
+                    android:text="0.5 m/s²"
+                    android:gravity="center"/>
 
             </LinearLayout>
 
@@ -158,12 +166,13 @@
         </LinearLayout>
 
         <!--    启动停止按钮-->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
 
                 <Button
                     android:id="@+id/btn_off_on_system"
@@ -189,10 +198,21 @@
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="20dp"
                     android:text="查看详情"
-                    android:visibility="gone"
+                    android:visibility="invisible"
+                    android:onClick="onClick"/>
+                <Button
+                    android:id="@+id/btn_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/btn_stop_emergency"
+                    android:layout_alignBaseline="@+id/btn_detail"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="20dp"
+                    android:text="保存数据"
+                    android:visibility="invisible"
                     android:onClick="onClick"/>
             </RelativeLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 
@@ -206,9 +226,7 @@
             android:id="@+id/rLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="11"
-            android:layout_gravity="center">
-
+            android:layout_weight="2">
             <com.example.mobilelocationapp.CanvasView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
@@ -217,20 +235,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
+            android:layout_weight="1"
             android:orientation="horizontal">
-            <LinearLayout
-                android:id="@+id/llayout_X_error"
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_x"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal" />
-            <LinearLayout
-                android:id="@+id/llayout_Y_error"
+                android:layout_weight="1"/>
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_y"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal" />
+                android:layout_weight="1"/>
+
         </LinearLayout>
     </LinearLayout>
 
