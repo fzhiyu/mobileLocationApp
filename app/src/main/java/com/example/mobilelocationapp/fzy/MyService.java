@@ -6,7 +6,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ public class MyService extends Service {
     String onLine = "在线";
     String offLine = "离线";
     long[] heartTime = {0, 0, 0, 0};
+    int isCreate = 0;
 
     public class MyBinder extends Binder{
         public MyService getService() {
@@ -55,6 +58,7 @@ public class MyService extends Service {
         exec.execute(tcpSlaveServer1);
         exec.execute(tcpSlaveServer2);
         exec.execute(tcpSlaveServer3);
+        isCreate = 1;
     }
 
     //获取最新心跳信息
@@ -120,28 +124,48 @@ public class MyService extends Service {
                 if (tcpMasterServer.inputThread != null) {
                     exec.execute(() -> tcpMasterServer.inputThread.sendData(message));
                 } else {
-                    Toast.makeText(context, "主车未连接", Toast.LENGTH_SHORT).show();
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "主车未连接", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
                 break;
             case 1:
                 if (tcpSlaveServer1.inputThread != null) {
                     exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
                 } else {
-                    Toast.makeText(context, "从车一未连接", Toast.LENGTH_SHORT).show();
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "从车一未连接", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
                 break;
             case 2:
                 if (tcpSlaveServer2.inputThread != null) {
                     exec.execute(() -> tcpSlaveServer2.inputThread.sendData(message));
                 } else {
-                    Toast.makeText(context, "从车二未连接", Toast.LENGTH_SHORT).show();
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "从车二未连接", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
                 break;
             case 3:
                 if (tcpSlaveServer3.inputThread != null) {
                     exec.execute(() -> tcpSlaveServer3.inputThread.sendData(message));
                 } else {
-                    Toast.makeText(context, "从车三未连接", Toast.LENGTH_SHORT).show();
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "从车三未连接", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
                 break;
             default:
