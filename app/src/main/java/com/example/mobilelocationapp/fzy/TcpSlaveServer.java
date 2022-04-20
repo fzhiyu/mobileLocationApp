@@ -123,7 +123,7 @@ public class TcpSlaveServer implements Runnable{
         }
 
         @Override
-        public void run() {
+        public synchronized void run() {
             process();
 
             try {

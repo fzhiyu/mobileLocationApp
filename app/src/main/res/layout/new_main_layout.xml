@@ -274,7 +274,8 @@
                     android:layout_marginTop="2dp"
                     android:layout_toEndOf="@+id/TLeft"
                     android:onClick="fineTurn"
-                    android:text="开启微调" />
+                    android:text="开启微调"
+                    android:enabled="false"/>
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/TRight"
@@ -339,7 +340,7 @@
                     android:background="@drawable/round_button"
                     android:onClick="sendStop"
                     android:text="@string/stop"
-                    android:textAppearance="?android:textAppearanceLarge"/>
+                    android:textAppearance="?android:textAppearanceLarge" />
 
                 <ImageButton
                     android:id="@+id/ibtn_up"
@@ -348,7 +349,6 @@
                     android:layout_above="@id/btn_stop"
                     android:layout_centerHorizontal="true"
                     android:background="@color/white"
-                    android:onClick="sendUp"
                     app:srcCompat="@drawable/ic_up" />
 
                 <ImageButton
@@ -358,7 +358,6 @@
                     android:layout_below="@id/btn_stop"
                     android:layout_centerHorizontal="true"
                     android:background="@color/white"
-                    android:onClick="sendDown"
                     app:srcCompat="@drawable/ic_down" />
 
                 <ImageButton
@@ -368,7 +367,6 @@
                     android:layout_centerVertical="true"
                     android:layout_toLeftOf="@+id/btn_stop"
                     android:background="@color/white"
-                    android:onClick="sendLeft"
                     android:src="@drawable/ic_left" />
 
                 <ImageButton
@@ -378,7 +376,6 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/btn_stop"
                     android:background="@color/white"
-                    android:onClick="sendRight"
                     android:src="@drawable/ic_right" />
             </RelativeLayout>
         </RelativeLayout>

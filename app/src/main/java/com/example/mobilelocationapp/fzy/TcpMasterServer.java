@@ -33,7 +33,7 @@ public class TcpMasterServer implements Runnable{
     Socket socket;
     BufferedReader br;
     long currHeart = 0;
-    boolean flag;
+    boolean flag = false;
 
     public TcpMasterServer(Context context) {
         this.host = host;
@@ -126,9 +126,11 @@ public class TcpMasterServer implements Runnable{
                 String str = null;
                 try {
                     try {
+                        socket.setSoTimeout(5000);
                         str = br.readLine();
                     } catch (IOException e) {
-                        inputStream.close();
+                        flag = false;
+                        br.close();
                         e.printStackTrace();
                     }
 
@@ -148,8 +150,9 @@ public class TcpMasterServer implements Runnable{
 
             try {
                 socket.close();
+                flag = false;
                 Log.e(TAG, "run: 与客户端断开连接" );
-                inputThread = null;
+//                inputThread = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
