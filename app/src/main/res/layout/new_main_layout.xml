@@ -313,6 +313,7 @@
                 android:layout_alignParentBottom="true">
 
                 <ImageButton
+                    android:id="@+id/RotateLeft"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
@@ -323,6 +324,7 @@
                     android:src="@drawable/ic_baseline_rotate_left_24" />
 
                 <ImageButton
+                    android:id="@+id/RotateRight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"

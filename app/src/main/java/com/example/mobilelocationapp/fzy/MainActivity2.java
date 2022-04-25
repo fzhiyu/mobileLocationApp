@@ -53,48 +53,37 @@ import java.util.Map;
 
 public class MainActivity2 extends AppCompatActivity {
     public static final String suffix = "\r\n";
-    private Boolean longPress;//表征是否在按压
+    private volatile Boolean longPress;//表征是否在按压
     private final double num_up_acc = 0;
     private final double num_down_acc = 0;//设置最大的限度
     private float circleX;
     private float circleY;
     //坐标系位置
-    float paintX;
-    float paintY;
-    //圆半径
-    private int radius;
+    private float paintX;
+    private float paintY;
     //声明画笔
     private Canvas my_canvas1;
     private Paint paint;
-    //屏幕宽高
-    int screenWidth;
-    int screenHeight;
     //view的宽高
-    int ViewWidth;
-    int ViewHeight;
-    //位图宽高
-    int bitmapWidth;
-    int bitmapHeight;
+    private int ViewWidth;
+    private int ViewHeight;
     LinearLayout linearLayout;
-    //位图左上角坐标
-    int bitmapX;
-    int bitmapY;
-    float textWidth = 3f;
-    float textSize = 20;
-    MyDrawView myDrawView;
-    volatile MyService.MyBinder myBinder;
-    MyService myService;
-    Boolean myBound = false;
-    Button btn_send, btn_create, nextPage;
-    TextView txtIP;
-    EditText edtShow;
-    StringBuffer stringBuffer = new StringBuffer();
-    MyBroadcast myBroadcast = new MyBroadcast();
-    List<Car> cars = new ArrayList<>();
-    AppCompatSeekBar seekBar;
-    TextView speedTxt;
-    LinkedList<String> formCars = new LinkedList<>();
-    TextView formCar;
+    private final float textWidth = 3f;
+    private MyDrawView myDrawView;
+    private volatile MyService.MyBinder myBinder;
+    private MyService myService;
+    private Boolean myBound = false;
+    private Button btn_send;
+    private Button btn_create;
+    private TextView txtIP;
+    private EditText edtShow;
+    private final StringBuffer stringBuffer = new StringBuffer();
+    private final MyBroadcast myBroadcast = new MyBroadcast();
+    private List<Car> cars = new ArrayList<>();
+    private AppCompatSeekBar seekBar;
+    private TextView speedTxt;
+    private final LinkedList<String> formCars = new LinkedList<>();
+    private TextView formCar;
     String car1 = "  从车一";
     String car2 = "  从车二";
     String car3 = "  从车三";
@@ -132,7 +121,9 @@ public class MainActivity2 extends AppCompatActivity {
     Map<Integer, String> map = new HashMap<>();
     Map<Integer, Car> carMap = new HashMap<>();
     DecimalFormat df = new DecimalFormat("#.##");
-    private ImageButton btn_up, btn_down, btn_left, btn_right;
+    private ImageButton btn_up, btn_down, btn_left, btn_right, RotateLeft, RotateRight;
+    Handler handler = new Handler();
+    Runnable runnable1, runnable2;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -213,20 +204,18 @@ public class MainActivity2 extends AppCompatActivity {
         btn_up.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                longPress = false;
+//                longPress = false;
                 String cmdPress = UP + speed + suffix;
                 String cmdStopPress =  STOP;
                 longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
 //                Log.e(TAG, "onTouch: " + motionEvent );
-
                 return true;
-
             }
         });
         btn_down.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                longPress = false;
+//                longPress = false;
                 String cmdPress = DOWN + speed + suffix;
                 String cmdStopPress =  STOP;
                 longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
@@ -237,7 +226,7 @@ public class MainActivity2 extends AppCompatActivity {
         btn_left.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                longPress = false;
+//                longPress = false;
                 String cmdPress = LEFT + speed + suffix;
                 String cmdStopPress =  STOP;
                 longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
@@ -248,8 +237,30 @@ public class MainActivity2 extends AppCompatActivity {
         btn_right.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                longPress = false;
+//                longPress = false;
                 String cmdPress = RIGHT + speed + suffix;
+                String cmdStopPress =  STOP;
+                longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
+                return true;
+            }
+        });
+
+        RotateLeft.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                longPress = false;
+                String cmdPress = ROTATEL + speed + suffix;
+                String cmdStopPress =  STOP;
+                longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
+                return true;
+            }
+        });
+
+        RotateRight.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                longPress = false;
+                String cmdPress = ROTATER + speed + suffix;
                 String cmdStopPress =  STOP;
                 longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
                 return true;
@@ -264,24 +275,24 @@ public class MainActivity2 extends AppCompatActivity {
                 longPress = true;
 
                 Log.e(TAG, "longTouchSendCmd: 按下" );
-                Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
+                runnable1 = new Runnable() {
                     @Override
                     public void run() {
                         if (longPress) {
                             myBinder.sendMessageBind(cmdPress, currRadio, getApplicationContext());
-                            Log.e(TAG, "run: " + new Date() );
+                            Log.e(TAG, "run: " + System.currentTimeMillis() + " " + new Date());
                         }
                         handler.postDelayed(this, 1000);
                     }
                 };
-                handler.postDelayed(runnable, 10);
+
+                handler.postDelayed(runnable1, 1);
                 break;
             }
             case MotionEvent.ACTION_UP:{
                 longPress = false;
+                handler.removeCallbacks(runnable1);
                 Log.e(TAG, "longTouchSendCmd: 松开" );
-//                handler.removeCallbacks(runnable);
                 //发送停止指令
                 myBinder.sendMessageBind(cmdStopPress, currRadio, getApplicationContext());
             }
@@ -295,7 +306,7 @@ public class MainActivity2 extends AppCompatActivity {
         //获取布局文件里的linearlayout容器
         linearLayout.addView(myDrawView);
 
-        nextPage = findViewById(R.id.StartFormation);
+        Button nextPage = findViewById(R.id.StartFormation);
         txtIP = findViewById(R.id.ip2);
         seekBar = findViewById(R.id.seekBar_speed);
         speedTxt = findViewById(R.id.speedTxt2);
@@ -315,11 +326,12 @@ public class MainActivity2 extends AppCompatActivity {
         btn_down = findViewById(R.id.ibtn_down);
         btn_left = findViewById(R.id.ibtn_left);
         btn_right = findViewById(R.id.ibtn_right);
+        RotateLeft = findViewById(R.id.RotateLeft);
+        RotateRight = findViewById(R.id.RotateRight);
     }
 
     //检测连接状态
     private void detectConnect() {
-        Handler handler = new Handler();
         Runnable runnable = new Runnable(){
             @Override
             public void run() {
@@ -417,7 +429,7 @@ public class MainActivity2 extends AppCompatActivity {
         });
     }
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myBinder = (MyService.MyBinder) iBinder;
@@ -433,6 +445,7 @@ public class MainActivity2 extends AppCompatActivity {
     };
 
     //设置复选框
+    @SuppressLint("NonConstantResourceId")
     public void onCheckboxClicked(View view) {
         // Is the view now checked?
         boolean checked = ((CheckBox) view).isChecked();
@@ -500,6 +513,7 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     public void StartFormation(View view) {
+        handler.removeCallbacks(runnable2);
         myBinder.sendMessageBind(StartFormation, currRadio, getApplicationContext());
         Intent intent = new Intent(MainActivity2.this, SecondActivity.class);
         startActivity(intent);
@@ -618,8 +632,7 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private void drawAll() {
-        Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
+        runnable2 = new Runnable() {
             @Override
             public void run() {
                 //每一秒读取一次map, 画点，擦除点的时候，直接擦除整体
@@ -641,7 +654,7 @@ public class MainActivity2 extends AppCompatActivity {
                 handler.postDelayed(this, 1000);
             }
         };
-        handler.postDelayed(runnable, 1000);
+        handler.postDelayed(runnable2, 1000);
     }
 
     //消除点
@@ -713,12 +726,14 @@ public class MainActivity2 extends AppCompatActivity {
             //获取屏幕长宽
             DisplayMetrics metrics = new DisplayMetrics();   //for all android versions
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            screenWidth = metrics.widthPixels;
-            screenHeight = metrics.heightPixels;
+            //屏幕宽高
+            int screenWidth = metrics.widthPixels;
+            int screenHeight = metrics.heightPixels;
 
             //设置位图宽高
-            bitmapWidth = screenWidth;
-            bitmapHeight = screenHeight;
+            //位图宽高
+            int bitmapWidth = screenWidth;
+            int bitmapHeight = screenHeight;
 
             //设置位图的宽高
             bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.RGB_565);
@@ -733,14 +748,16 @@ public class MainActivity2 extends AppCompatActivity {
 
             //位图的左上角坐标
 //            bitmapX = screenWidth - linearLayout.getLeft() - ViewWidth;
-            bitmapX = 0;
-            bitmapY = 0;
+            //位图左上角坐标
+            int bitmapX = 0;
+            int bitmapY = 0;
             //圆心的坐标
             circleX = (float) ViewWidth / 2;
 //            circleY = (float) ViewHeight / 2;
             circleY = 0;
             //圆半径
-            radius = 550;
+            //圆半径
+            int radius = 550;
 
             //设置直线的起始点
             float lineStartX = circleX - radius;
@@ -789,6 +806,7 @@ public class MainActivity2 extends AppCompatActivity {
             float lineEndY = circleY + radius;
             canvas.drawLine(circleX, lineStartY, circleX, lineEndY, paint);
             //画比例尺
+            float textSize = 20;
             paint.setTextSize(textSize);
             paint.setStyle(Paint.Style.FILL);
 //            canvas.drawText("1格 : 0.5米", ViewWidth -300, 400, paint);
