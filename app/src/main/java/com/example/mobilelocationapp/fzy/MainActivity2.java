@@ -134,23 +134,24 @@ public class MainActivity2 extends AppCompatActivity {
 
         init();
 
-        //显示IP地址
-        txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
-        //控制平板横向
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        //设置速度
-        speedTxt.setText(speed + "m/s");
+        //创建服务，连接广播
+        connect();
 
-        //获取view的长宽
-        ViewTreeObserver observer = linearLayout.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                ViewHeight = linearLayout.getHeight();
-                ViewWidth = linearLayout.getWidth();
-            }
-        });
+        //创建定时器检测连接状态
+        detectConnect();
 
+        //控制速度进度条
+        controlSpeed();
+
+        //新建线程，画点，作为一个集合，一秒画一次
+        drawAll();
+
+        //设置按钮响应
+        setButton();
+    }
+
+    //绑定服务，创建广播
+    private void connect() {
         Log.e(TAG, "onCreate: 主页面" );
         IntentFilter intentFilter1 = new IntentFilter("get1102");
         IntentFilter intentFilter2 = new IntentFilter("get1103");
@@ -184,18 +185,6 @@ public class MainActivity2 extends AppCompatActivity {
         };
         //1秒后执行操作
         handler.postDelayed(runnable1, 1000);// 打开定时器，50ms后执行runnable操作
-
-        //创建定时器检测连接状态
-        detectConnect();
-
-        //控制速度进度条
-        controlSpeed();
-
-        //新建线程，画点，作为一个集合，一秒画一次
-        drawAll();
-
-        //设置按钮响应
-        setButton();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -249,8 +238,8 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 //                longPress = false;
-                String cmdPress = ROTATEL + speed + suffix;
-                String cmdStopPress =  STOP;
+                String cmdPress = ROTATEL + suffix;
+                String cmdStopPress = STOP;
                 longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
                 return true;
             }
@@ -260,8 +249,8 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 //                longPress = false;
-                String cmdPress = ROTATER + speed + suffix;
-                String cmdStopPress =  STOP;
+                String cmdPress = ROTATER + suffix;
+                String cmdStopPress = STOP;
                 longTouchSendCmd(MainActivity2.this, cmdPress, cmdStopPress, motionEvent);
                 return true;
             }
@@ -274,13 +263,13 @@ public class MainActivity2 extends AppCompatActivity {
             case MotionEvent.ACTION_DOWN:{ //持续点击按钮
                 longPress = true;
 
-                Log.e(TAG, "longTouchSendCmd: 按下" );
+//                Log.e(TAG, "longTouchSendCmd: 按下" );
                 runnable1 = new Runnable() {
                     @Override
                     public void run() {
                         if (longPress) {
                             myBinder.sendMessageBind(cmdPress, currRadio, getApplicationContext());
-                            Log.e(TAG, "run: " + System.currentTimeMillis() + " " + new Date());
+//                            Log.e(TAG, "run: " + System.currentTimeMillis() + " " + new Date());
                         }
                         handler.postDelayed(this, 1000);
                     }
@@ -292,7 +281,7 @@ public class MainActivity2 extends AppCompatActivity {
             case MotionEvent.ACTION_UP:{
                 longPress = false;
                 handler.removeCallbacks(runnable1);
-                Log.e(TAG, "longTouchSendCmd: 松开" );
+//                Log.e(TAG, "longTouchSendCmd: 松开" );
                 //发送停止指令
                 myBinder.sendMessageBind(cmdStopPress, currRadio, getApplicationContext());
             }
@@ -328,6 +317,23 @@ public class MainActivity2 extends AppCompatActivity {
         btn_right = findViewById(R.id.ibtn_right);
         RotateLeft = findViewById(R.id.RotateLeft);
         RotateRight = findViewById(R.id.RotateRight);
+
+        //显示IP地址
+        txtIP.setText(CommendFun.getLocalIP(getApplicationContext()));
+        //控制平板横向
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //设置速度
+        speedTxt.setText(speed + "m/s");
+
+        //获取view的长宽
+        ViewTreeObserver observer = linearLayout.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                ViewHeight = linearLayout.getHeight();
+                ViewWidth = linearLayout.getWidth();
+            }
+        });
     }
 
     //检测连接状态

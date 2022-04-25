@@ -80,7 +80,7 @@ public class TcpSlaveServer implements Runnable{
             return serverSocket.accept();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG, "更新状态");
+//            Log.e(TAG, "更新状态");
             return null;
         }
     }
@@ -123,7 +123,7 @@ public class TcpSlaveServer implements Runnable{
         }
 
         @Override
-        public synchronized void run() {
+        public void run() {
             process();
 
             try {
@@ -145,6 +145,7 @@ public class TcpSlaveServer implements Runnable{
                     str = br.readLine();
                 } catch (IOException e) {
                     flag = false;
+                    Log.e(TAG, "process: 客户端异常关闭，与服务端断开连接" );
                     try {
                         br.close();
 //                        flag = false;
@@ -160,6 +161,7 @@ public class TcpSlaveServer implements Runnable{
                 }
                 if (System.currentTimeMillis() - currHeart > 2500) {
                     flag = false;
+                    Log.e(TAG, "process: 超时2.5秒，与客户端断开连接" );
                 }
                 if (str != null && str.charAt(0) == 'V') {
                     Intent intent = new Intent();

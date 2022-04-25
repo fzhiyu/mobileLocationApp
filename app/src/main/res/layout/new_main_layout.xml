@@ -170,30 +170,6 @@
                 </RadioGroup>
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/speedTxt1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/layout4"
-                android:text="速度：" />
-
-            <TextView
-                android:id="@+id/speedTxt2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/layout4"
-                android:layout_toEndOf="@+id/speedTxt1"
-                android:text="30 m/s" />
-
-            <androidx.appcompat.widget.AppCompatSeekBar
-                android:id="@+id/seekBar_speed"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/layout4"
-                android:layout_toEndOf="@+id/speedTxt2"
-                android:max="100"
-                android:progress="30" />
-
         </RelativeLayout>
 
         <com.google.android.material.divider.MaterialDivider
@@ -305,6 +281,30 @@
                 android:text="控制方向:"
                 android:textSize="30px"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/speedTxt1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_turn2"
+                android:text="速度：" />
+
+            <TextView
+                android:id="@+id/speedTxt2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_turn2"
+                android:layout_toEndOf="@+id/speedTxt1"
+                android:text="30 m/s" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBar_speed"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txt_turn2"
+                android:layout_toEndOf="@+id/speedTxt2"
+                android:max="100"
+                android:progress="30" />
 
             <RelativeLayout
                 android:id="@+id/wheel"
