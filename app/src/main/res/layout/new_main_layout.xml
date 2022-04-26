@@ -249,9 +249,9 @@
                     android:layout_below="@id/turn_angle1"
                     android:layout_marginTop="2dp"
                     android:layout_toEndOf="@+id/TLeft"
+                    android:enabled="false"
                     android:onClick="fineTurn"
-                    android:text="开启微调"
-                    android:enabled="false"/>
+                    android:text="开启微调" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/TRight"
@@ -295,7 +295,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txt_turn2"
                 android:layout_toEndOf="@+id/speedTxt1"
-                android:text="30 m/s" />
+                android:text="0.3 m/s" />
 
             <androidx.appcompat.widget.AppCompatSeekBar
                 android:id="@+id/seekBar_speed"
@@ -309,7 +309,7 @@
             <RelativeLayout
                 android:id="@+id/wheel"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true">
 
                 <ImageButton
@@ -338,6 +338,7 @@
                     android:id="@+id/btn_stop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/ibtn_up"
                     android:layout_centerInParent="true"
                     android:background="@drawable/round_button"
                     android:onClick="sendStop"
@@ -348,7 +349,6 @@
                     android:id="@+id/ibtn_up"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@id/btn_stop"
                     android:layout_centerHorizontal="true"
                     android:background="@color/white"
                     app:srcCompat="@drawable/ic_up" />

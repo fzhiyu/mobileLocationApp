@@ -124,6 +124,7 @@ public class MyService extends Service {
                 if (tcpMasterServer.inputThread != null) {
                     exec.execute(() -> tcpMasterServer.inputThread.sendData(message));
                 } else {
+                    //避免在主线程之外使用Toast
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
