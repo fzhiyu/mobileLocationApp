@@ -68,7 +68,7 @@ public class TcpMasterServer implements Runnable{
         } else {
             status = false;
         }
-        return status;
+        return flag;
     }
 
     //获取最新的心跳的时间
