@@ -320,7 +320,6 @@
                     android:layout_marginEnd="20dp"
                     android:layout_toStartOf="@+id/ibtn_up"
                     android:background="@color/white"
-                    android:onClick="sendRotateLeft"
                     android:src="@drawable/ic_baseline_rotate_left_24" />
 
                 <ImageButton
@@ -331,7 +330,6 @@
                     android:layout_marginTop="20dp"
                     android:layout_toEndOf="@+id/ibtn_up"
                     android:background="@color/white"
-                    android:onClick="sendRotateRight"
                     android:src="@drawable/ic_baseline_rotate_right_24" />
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -367,7 +365,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/btn_stop"
+                    android:layout_toStartOf="@+id/btn_stop"
                     android:background="@color/white"
                     android:src="@drawable/ic_left" />
 
@@ -376,7 +374,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/btn_stop"
+                    android:layout_toEndOf="@+id/btn_stop"
                     android:background="@color/white"
                     android:src="@drawable/ic_right" />
             </RelativeLayout>

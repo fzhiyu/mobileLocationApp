@@ -19,17 +19,14 @@ import java.util.concurrent.Executors;
 
 public class MyService extends Service {
 
-    TCPServer tcpServer;
-    ExecutorService exec;
-    TcpSlaveServer tcpSlaveServer1;
-    TcpSlaveServer tcpSlaveServer2;
-    TcpSlaveServer tcpSlaveServer3;
-    TcpMasterServer tcpMasterServer;
-    String[] status;
-    String onLine = "在线";
-    String offLine = "离线";
-    long[] heartTime = {0, 0, 0, 0};
-    int isCreate = 0;
+    private TCPServer tcpServer;
+    private ExecutorService exec;
+    private TcpSlaveServer tcpSlaveServer1;
+    private TcpSlaveServer tcpSlaveServer2;
+    private TcpSlaveServer tcpSlaveServer3;
+    private TcpMasterServer tcpMasterServer;
+    private final long[] heartTime = {0, 0, 0, 0};
+    private int isCreate = 0;
 
     public class MyBinder extends Binder{
         public MyService getService() {
@@ -41,6 +38,10 @@ public class MyService extends Service {
         public void createTcpBind() {
             createTcp();
         }
+    }
+
+    public int getIsCreate() {
+        return isCreate;
     }
 
     private void createTcp(){
@@ -72,8 +73,10 @@ public class MyService extends Service {
 
     //获取连接状态
     public String[] getStatus() {
-        status = new String[4];
+        String[] status = new String[4];
         String master, slave1, slave2, slave3;
+        String onLine = "在线";
+        String offLine = "离线";
         if (tcpMasterServer != null && tcpMasterServer.getStatus()) {
             master = onLine;
         } else {
@@ -121,8 +124,8 @@ public class MyService extends Service {
     private void sendMessage(String message, int currRadio, Context context) {
         switch (currRadio) {
             case 0:
-                if (tcpMasterServer.inputThread != null) {
-                    exec.execute(() -> tcpMasterServer.inputThread.sendData(message));
+                if (tcpMasterServer.getInputThread() != null) {
+                    exec.execute(() -> tcpMasterServer.getInputThread().sendData(message));
                 } else {
                     //避免在主线程之外使用Toast
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -134,8 +137,8 @@ public class MyService extends Service {
                 }
                 break;
             case 1:
-                if (tcpSlaveServer1.inputThread != null) {
-                    exec.execute(() -> tcpSlaveServer1.inputThread.sendData(message));
+                if (tcpSlaveServer1.getInputThread() != null) {
+                    exec.execute(() -> tcpSlaveServer1.getInputThread().sendData(message));
                 } else {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
@@ -146,8 +149,8 @@ public class MyService extends Service {
                 }
                 break;
             case 2:
-                if (tcpSlaveServer2.inputThread != null) {
-                    exec.execute(() -> tcpSlaveServer2.inputThread.sendData(message));
+                if (tcpSlaveServer2.getInputThread() != null) {
+                    exec.execute(() -> tcpSlaveServer2.getInputThread().sendData(message));
                 } else {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
@@ -158,8 +161,8 @@ public class MyService extends Service {
                 }
                 break;
             case 3:
-                if (tcpSlaveServer3.inputThread != null) {
-                    exec.execute(() -> tcpSlaveServer3.inputThread.sendData(message));
+                if (tcpSlaveServer3.getInputThread() != null) {
+                    exec.execute(() -> tcpSlaveServer3.getInputThread().sendData(message));
                 } else {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override

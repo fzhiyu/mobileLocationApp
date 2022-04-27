@@ -24,26 +24,27 @@ import java.util.Stack;
 
 public class TcpSlaveServer implements Runnable{
 
-    //设置服务器ip地址
-    String host = "10.112.248.255";
     //设置端口
-    private int port;
+    private final int port;
     boolean isOpen = false;
-    private Context context;
-    String Tag = "fzy";
-    InputThread inputThread;
-    BufferedReader br;
+    private final Context context;
+    private final String Tag = "fzy";
+    private InputThread inputThread;
+    private BufferedReader br;
     private PrintWriter printWriter;
-    ServerSocket serverSocket;
-    Socket socket;
+    private Socket socket;
     boolean flag = false;
     long currHeart = 0;
 
     public TcpSlaveServer(int port, Context context) {
-        this.host = host;
+        //设置服务器ip地址
         this.port = port;
         this.context = context;
         isOpen = true;
+    }
+
+    public InputThread getInputThread() {
+        return inputThread;
     }
 
     //获取连接状态
@@ -62,7 +63,7 @@ public class TcpSlaveServer implements Runnable{
     @Override
     public void run() {
         try {
-            serverSocket = new ServerSocket(port);
+            ServerSocket serverSocket = new ServerSocket(port);
             while (isOpen) {
                 socket = getSocket(serverSocket);
                 if(socket != null) {

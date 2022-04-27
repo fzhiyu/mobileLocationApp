@@ -82,13 +82,14 @@ public class MainActivity2 extends AppCompatActivity {
     private TextView speedTxt;
     private final LinkedList<String> formCars = new LinkedList<>();
     private TextView formCar;
-    private final String UP = "UP 0 ";
-    private final String DOWN = "DOWN 0 ";
-    private final String LEFT = "LEFT 0 ";
-    private final String RIGHT = "RIGHT 0 ";
+    private final String UP = "UP";
+    private final String DOWN = "DOWN";
+    private final String LEFT = "LEFT";
+    private final String RIGHT = "RIGHT";
     private final String STOP = "STOP 0\r\n";
     private final String ROTATEL  = "ROTATEL ";
     private final String ROTATER  = "ROTATER ";
+    private final int acceleration = 0;
     private final String StopFormation = "StopFormation\r\n";
     //当前选择的radio
     private int currRadio = 0;
@@ -211,7 +212,7 @@ public class MainActivity2 extends AppCompatActivity {
             public void run() {
                 // TODO Auto-generated method stub
                 // 在服务已经创建好的情况下，并且不重复创建服务器
-                if (myBinder != null && myService.isCreate == 0) {
+                if (myBinder != null && myService.getIsCreate() == 0) {
                     myBinder.createTcpBind();
                 }
 //                Log.e(TAG, "run: handler;");
@@ -227,27 +228,27 @@ public class MainActivity2 extends AppCompatActivity {
     private void setButton() {
 
         btn_up.setOnTouchListener((view, motionEvent) -> {
-            String up = UP + speed + suffix;
+            String up = UP + " " + acceleration + " " + speed + suffix;
             longTouchSendCmd(up, motionEvent);
             return true;
         });
         btn_down.setOnTouchListener((view, motionEvent) -> {
 //                longPress = false;
-            String down = DOWN + speed + suffix;
+            String down = DOWN + " " + acceleration + " " + speed + suffix;
             longTouchSendCmd(down, motionEvent);
             return true;
         });
 
         btn_left.setOnTouchListener((view, motionEvent) -> {
 //                longPress = false;
-            String leftMsg = LEFT + speed + suffix;
+            String leftMsg = LEFT + " " + acceleration + " " + speed + suffix;
             longTouchSendCmd(leftMsg, motionEvent);
             return true;
         });
 
         btn_right.setOnTouchListener((view, motionEvent) -> {
 //                longPress = false;
-            String rightMsg = RIGHT + speed + suffix;
+            String rightMsg = RIGHT + " " + acceleration + " " + speed + suffix;
             longTouchSendCmd(rightMsg, motionEvent);
             return true;
         });
@@ -295,6 +296,44 @@ public class MainActivity2 extends AppCompatActivity {
                 myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
             }
         }
+    }
+
+    public void StartFormation(View view) {
+        handler.removeCallbacks(runnable2);
+        String startFormation = "StartFormation\r\n";
+        myBinder.sendMessageBind(startFormation, currRadio, getApplicationContext());
+        Intent intent = new Intent(MainActivity2.this, SecondActivity.class);
+        startActivity(intent);
+    }
+
+    public void sendStop(View view) {
+        myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
+    }
+
+    public void fineTurn(View view) {
+        if (btnFineTurn.getText().equals("关闭微调")) {
+            TLeft.setEnabled(false);
+            TRight.setEnabled(false);
+            btnFineTurn.setText("开启微调");
+            String stopFineTurn = "StopFineTurn\r\n";
+            myBinder.sendMessageBind(stopFineTurn, currRadio, getApplicationContext());
+        } else {
+            TLeft.setEnabled(true);
+            TRight.setEnabled(true);
+            btnFineTurn.setText("关闭微调");
+            String startFineTurn = "StartFineTurn\r\n";
+            myBinder.sendMessageBind(startFineTurn, currRadio, getApplicationContext());
+        }
+    }
+
+    public void sendTRight(View view) {
+        String TRIGHT = "TRIGHT 1\r\n";
+        myBinder.sendMessageBind(TRIGHT, currRadio, getApplicationContext());
+    }
+
+    public void sendTLeft(View view) {
+        String TLEFT = "TLEFT 1\r\n";
+        myBinder.sendMessageBind(TLEFT, currRadio, getApplicationContext());
     }
 
     //定时检测连接状态，更改ip地址
@@ -508,52 +547,6 @@ public class MainActivity2 extends AppCompatActivity {
             stringBuilder.append(s);
         }
 //        formCar.setText(stringBuilder);
-    }
-
-    public void StartFormation(View view) {
-        handler.removeCallbacks(runnable2);
-        String startFormation = "StartFormation\r\n";
-        myBinder.sendMessageBind(startFormation, currRadio, getApplicationContext());
-        Intent intent = new Intent(MainActivity2.this, SecondActivity.class);
-        startActivity(intent);
-    }
-
-    public void sendStop(View view) {
-        myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
-    }
-
-    public void sendRotateLeft(View view) {
-        myBinder.sendMessageBind(ROTATEL, currRadio, getApplicationContext());
-    }
-
-    public void sendRotateRight(View view) {
-        myBinder.sendMessageBind(ROTATER, currRadio, getApplicationContext());
-    }
-
-    public void fineTurn(View view) {
-        if (btnFineTurn.getText().equals("关闭微调")) {
-            TLeft.setEnabled(false);
-            TRight.setEnabled(false);
-            btnFineTurn.setText("开启微调");
-            String stopFineTurn = "StopFineTurn\r\n";
-            myBinder.sendMessageBind(stopFineTurn, currRadio, getApplicationContext());
-        } else {
-            TLeft.setEnabled(true);
-            TRight.setEnabled(true);
-            btnFineTurn.setText("关闭微调");
-            String startFineTurn = "StartFineTurn\r\n";
-            myBinder.sendMessageBind(startFineTurn, currRadio, getApplicationContext());
-        }
-    }
-
-    public void sendTRight(View view) {
-        String TRIGHT = "TRIGHT 1\r\n";
-        myBinder.sendMessageBind(TRIGHT, currRadio, getApplicationContext());
-    }
-
-    public void sendTLeft(View view) {
-        String TLEFT = "TLEFT 1\r\n";
-        myBinder.sendMessageBind(TLEFT, currRadio, getApplicationContext());
     }
 
     //设置广播

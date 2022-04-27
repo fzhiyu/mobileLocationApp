@@ -19,7 +19,7 @@ public class TcpMasterServer implements Runnable{
     private boolean isOpen = false;
     private final Context context;
     private final String Tag = "fzy";
-    InputThread inputThread;
+    private InputThread inputThread;
     private Socket socket;
     private BufferedReader br;
     private long currHeart = 0;
@@ -30,6 +30,10 @@ public class TcpMasterServer implements Runnable{
 
         this.context = context;
         isOpen = true;
+    }
+
+    public InputThread getInputThread() {
+        return inputThread;
     }
 
     @Override
