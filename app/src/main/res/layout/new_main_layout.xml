@@ -142,7 +142,6 @@
                         android:layout_height="wrap_content"
                         android:checked="false"
                         android:clickable="false"
-                        android:enabled="false"
                         android:onClick="onRadioButtonClicked"
                         android:text="从一"
                         android:textSize="15sp" />
@@ -152,7 +151,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="false"
-                        android:enabled="false"
                         android:onClick="onRadioButtonClicked"
                         android:text="从二"
                         android:textSize="15sp" />
@@ -162,7 +160,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="false"
-                        android:enabled="false"
                         android:onClick="onRadioButtonClicked"
                         android:text="从三"
                         android:textSize="15sp" />
@@ -237,7 +234,6 @@
                     android:layout_below="@id/turn_angle1"
                     android:layout_toEndOf="@+id/txt_turn"
                     android:background="@color/white"
-                    android:onClick="sendTLeft"
                     android:padding="0dp"
                     android:paddingBottom="0dp"
                     android:src="@drawable/ic_left2" />
@@ -260,7 +256,6 @@
                     android:layout_below="@id/turn_angle1"
                     android:layout_toEndOf="@+id/fineTurn"
                     android:background="@color/white"
-                    android:onClick="sendTRight"
                     android:padding="0dp"
                     android:paddingBottom="0dp"
                     android:src="@drawable/ic_right2" />

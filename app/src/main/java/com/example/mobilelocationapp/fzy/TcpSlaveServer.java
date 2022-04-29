@@ -173,7 +173,27 @@ public class TcpSlaveServer implements Runnable{
                     context.sendBroadcast(intent);
                 }
 
-                if (str != null && !str.equals("")) {
+                //接收Angle消息
+                if (str != null && str.startsWith("Angle")) {
+                    Intent intent = new Intent();
+                    String action = "get" + port;
+                    intent.setAction(action);
+                    intent.putExtra("Angle", str);
+                    intent.putExtra("port", port);
+                    context.sendBroadcast(intent);
+                }
+
+                //接收FineTurnStop信息
+                if (str != null && str.startsWith("FineTurnStop")) {
+                    Intent intent = new Intent();
+                    String action = "get" + port;
+                    intent.setAction(action);
+                    intent.putExtra("FineTurnStop", str);
+                    intent.putExtra("port", port);
+                    context.sendBroadcast(intent);
+                }
+
+                if (str != null) {
                     String[] strings = str.split(" "); //将字符串切分开
 
                     if (strings[0].compareToIgnoreCase("target") == 0) {//收到类型为target的消息
