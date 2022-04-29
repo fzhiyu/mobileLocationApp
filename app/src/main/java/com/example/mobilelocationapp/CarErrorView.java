@@ -23,7 +23,7 @@ public class CarErrorView extends View {
     private Paint textPaint;//画文字
     private Context mContext;//上下文引用
 
-    private float m_to_dp = 50;//表示用多少dp代表一米
+    private float m_to_dp = CanvasView.m_to_dp;//表示用多少dp代表一米
     private int textSize = 20;//文字大小
     private float strokeWidth; //描边宽度
     private float radius = 20; //小车的半径

@@ -43,20 +43,27 @@ public class CarList implements Serializable {
         targetPointList.add(targetPoint);
     }
 
+    /**
+     * 单位 cm
+     * @return
+     */
     public ArrayList<Double> getXError(){
         ArrayList<Double> xErrorList = new ArrayList<>();
         int min = Math.min(realPointList.size(), targetPointList.size());
         for (int i = 0; i < min; i++) {
-            xErrorList.add(realPointList.get(i).getX() - targetPointList.get(i).getX());
+            double error_cm = (realPointList.get(i).getX() - targetPointList.get(i).getX()) * 100;//m转化为cm
+            xErrorList.add(error_cm);
         }
         return xErrorList;
     }
+
 
     public ArrayList<Double> getYError(){
         ArrayList<Double> yErrorList = new ArrayList<>();
         int min = Math.min(realPointList.size(), targetPointList.size());
         for (int i = 0; i < min; i++) {
-            yErrorList.add(realPointList.get(i).getY() - targetPointList.get(i).getY());
+            double error_cm = (realPointList.get(i).getY() - targetPointList.get(i).getY()) * 100;
+            yErrorList.add(error_cm);
         }
         return yErrorList;
     }

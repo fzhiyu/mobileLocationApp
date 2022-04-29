@@ -15,6 +15,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -47,14 +48,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 public class SecondActivity extends AppCompatActivity{
+
+    public static final String TAG = "twoAct";
 
     public static final String ENTER = "\r\n";
     public static final String UP = "UP";
@@ -77,7 +82,6 @@ public class SecondActivity extends AppCompatActivity{
     public static final String CAR_LISTS = "carLists";
     private int controlledCarNum;
     private HashMap<Integer, CarList> carListsHash = new HashMap<>();//误差数据
-    private List<Double> xList, yList;
 
     //广播的action
     public static final String GET_1102 = "get1102";
@@ -88,12 +92,12 @@ public class SecondActivity extends AppCompatActivity{
 
     private RelativeLayout rLayout;
     private CarErrorView carErrorView;
-    private float m_to_dp = 50;//表示用多少dp代表一米
+    private float m_to_dp = CanvasView.m_to_dp;//表示用多少dp代表一米
 
     private SeekBar seekBar_up, seekBar_down, seekBar_time;//拖动条
     private TextView tv_up, tv_down, tv_time;
     private double up_acc = 1, down_acc = 1, speed = 1;//设置最大的限度
-    private double num_up_acc = up_acc / 2, num_down_acc = down_acc/ 2, num_speed = speed / 2;//初始的数值
+    private double num_up_acc = up_acc / 2, num_down_acc = down_acc / 2, num_speed = speed / 2;//初始的数值
 
     //控制台
     private Button btn_stop;
@@ -117,7 +121,7 @@ public class SecondActivity extends AppCompatActivity{
     private MyBroadcast myBroadcast = new MyBroadcast();
 
     //测试
-    private Timer timer;
+    private Timer timer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +129,7 @@ public class SecondActivity extends AppCompatActivity{
 
         setContentView(R.layout.second_layout);
 
-        Log.e(TAG, "onCreate: " + "two");
+        Log.i(TAG, "onCreate: " + "two");
         //设置横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
@@ -134,8 +138,6 @@ public class SecondActivity extends AppCompatActivity{
 
         //得到上个界面传过来的编队的小车, 并创建相应的储存数据的carList
         getCarPorts();
-        //测试
-        test();
 
         mContext = this;
 
@@ -144,6 +146,9 @@ public class SecondActivity extends AppCompatActivity{
 
         //设置拖动条
         setSeekBar();
+
+        //控制台长按事件
+        controlButton();
 
         //表格
         setLineChart();
@@ -160,7 +165,6 @@ public class SecondActivity extends AppCompatActivity{
                 myBinder = (MyService.MyBinder) iBinder;
                 myService = myBinder.getService();
                 myBound = true;
-                //myService.getContext(mContext);//将上下文传递给service
                 Log.i(TAG, "two: 绑定" );
             }
             @Override
@@ -174,27 +178,33 @@ public class SecondActivity extends AppCompatActivity{
     }
 
     public void getCarPorts(){
+        Set<Integer> set = new TreeSet<>();
         Intent intent = getIntent();
-        car_ports = intent.getIntArrayExtra(CAR_Ports);
+        if (intent.getIntExtra("s1", -1) == 1){
+            set.add(1102);
+        }
+        if (intent.getIntExtra("s2", -1) == 1){
+            set.add(1103);
+        }
+        if (intent.getIntExtra("s3", -1) == 1){
+            set.add(1104);
+        }
+
+        int num = set.size();
+        car_ports = new int[num];
+        int j = 0;
+        for (Integer i: set) {
+            car_ports[j++] = i;
+        }
 
         if (car_ports != null){
             controlledCarNum = car_ports.length;
             for (int i = 0; i < controlledCarNum; i++) {
+                Log.i(TAG, "getCarPorts: " + car_ports[i]);
                 carListsHash.put(car_ports[i], new CarList(car_ports[i]));
             }
         }
 
-    }
-
-    public void test(){
-        car_ports = new int[]{1102, 1103, 1104};
-
-        if (car_ports != null){
-            controlledCarNum = car_ports.length;
-            for (int i = 0; i < controlledCarNum; i++) {
-                carListsHash.put(car_ports[i], new CarList(car_ports[i]));
-            }
-        }
     }
 
     //初始化视图
@@ -237,6 +247,7 @@ public class SecondActivity extends AppCompatActivity{
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 num_up_acc = i / 10.0 * up_acc;
                 tv_up.setText(num_up_acc + " m/s²");
+                Log.i(TAG, "onProgressChanged: up " + num_up_acc);
             }
 
             @Override
@@ -255,6 +266,7 @@ public class SecondActivity extends AppCompatActivity{
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 num_down_acc = i / 10.0 * down_acc;
                 tv_down.setText(num_down_acc + " m/s²");
+                Log.i(TAG, "onProgressChanged: down " + num_down_acc);
             }
 
             @Override
@@ -273,6 +285,7 @@ public class SecondActivity extends AppCompatActivity{
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 num_speed = i / 10.0 * speed;
                 tv_time.setText(num_speed + " m/s");
+                Log.i(TAG, "onProgressChanged: speed " + num_speed);
             }
 
             @Override
@@ -296,6 +309,7 @@ public class SecondActivity extends AppCompatActivity{
                 String cmd = StOP + " " + down_acc + ENTER;
                 // 发送停车指令
                 myBinder.sendMessageBind(cmd, 0, mContext);
+                Log.i(TAG, "controlButton: " + cmd);
             }
         });
 
@@ -356,7 +370,9 @@ public class SecondActivity extends AppCompatActivity{
                                 try {
                                     //发送开始指令
                                     myBinder.sendMessageBind(cmdPress, 0, mContext);
+                                    Log.i(TAG, "controlButton " + cmdPress);
                                     Thread.sleep(500);//每0.5s一次
+
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -373,9 +389,40 @@ public class SecondActivity extends AppCompatActivity{
                 longPress = false;
                 //发送停止指令
                 myBinder.sendMessageBind(cmdStopPress, 0, mContext);
+                Log.i(TAG, "controlButton " + cmdStopPress);
             }
         }
     }
+
+//    private void longTouchSendCmd(final Activity activity, String cmdPress, String cmdStopPress, MotionEvent event){
+//
+//
+//        switch (event.getAction()){
+//            case MotionEvent.ACTION_DOWN:{
+//                longPress = true;
+//
+//                Handler handler = new Handler();
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (!longPress){
+//                            handler.removeCallbacks(this);
+//                        }
+//                        Log.e(TAG, "run: " + "send");
+//                        handler.postDelayed(this, 500);
+//                    }
+//
+//                };
+//                handler.postDelayed(runnable, 500);
+//                break;
+//            }
+//            case MotionEvent.ACTION_UP:{
+//                longPress = false;
+//                Log.e(TAG, ": " + "stop");
+//                break;
+//            }
+//        }
+//    }
 
     //初始化小车
     public void setCar(){
@@ -414,6 +461,7 @@ public class SecondActivity extends AppCompatActivity{
 
                 //收到v类型的数据后, 更新小车位置, 将小车的真实位置存入carList
                 if (v_message != null && !v_message.equals("") && port != -1){
+                    Log.i(TAG, "onReceive: " + v_message);
 
                     String[] messageData = v_message.split(" ");
 
@@ -431,6 +479,7 @@ public class SecondActivity extends AppCompatActivity{
 
                 //收到target类型的数据后, 将小车的理论位置存入carList
                 if (target_message != null && !target_message.equals("") && port != -1){
+                    Log.i(TAG, "onReceive: " + target_message);
                     if (isSystemOn){
                         String[] messageData = target_message.split(" ");
                         double x = Double.parseDouble(messageData[1]);
@@ -438,9 +487,9 @@ public class SecondActivity extends AppCompatActivity{
 
                         TargetPoint targetPoint = new TargetPoint(x, y);
 
-                        if (isSystemOn){
-                            carListsHash.get(port).addTargetPoint(targetPoint);
-                        }
+                        //如果追踪系统开着, 将数据放入carList中
+                        carListsHash.get(port).addTargetPoint(targetPoint);
+
                     }
                 }
 
@@ -502,10 +551,63 @@ public class SecondActivity extends AppCompatActivity{
         }
     }
 
+    public void test1(){
+        //用完删除
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                double x = Math.random() * 10 - 5;
+                double y = Math.random() * 5 + 0.1;
+                while (x == 0){
+                    x = Math.random() * 10 - 5;
+                }
+                Random random = new Random(1000001010 + System.currentTimeMillis());
+                double target_x = random.nextDouble() * 10 - 5;
+                while (target_x == 0){
+                    target_x = Math.random() * 10 - 5;
+                }
+                double target_y = random.nextDouble() * 5 + 0.1;
+                int port = (int)(Math.random() * 3) + 1 + base_port;
+                RealPoint realPoint = new RealPoint(port, x , y);
+                TargetPoint targetPoint = new TargetPoint(target_x, target_y);
+
+                carListsHash.get(port).addRealPoint(realPoint);
+                carListsHash.get(port).addTargetPoint(targetPoint);
+
+                carErrorView.update(realPoint);
+            }
+        }, 10, 500);
+    }
+
+    public void test2(){
+        //用完删除
+        timer.cancel();
+        Set<Integer> set = carListsHash.keySet();
+        for (int i = 0; i < 1000; i++) {
+            for (Integer port: set) {
+                double x = Math.random() * 10 - 5;
+                double y = Math.random() * 5 + 0.01;
+                while (x == 0){
+                    x = Math.random() * 10 - 5;
+                }
+                Random random = new Random(i * 12345);
+                double target_x = random.nextDouble() * 10 - 5;
+                double target_y = random.nextDouble() * 5 + 0.01;
+                while (target_x == 0){
+                    target_x = Math.random() * 10 - 5;
+                }
+                RealPoint realPoint = new RealPoint(port, x , y);
+                TargetPoint targetPoint = new TargetPoint(target_x, target_y);
+
+                carListsHash.get(port).addRealPoint(realPoint);
+                carListsHash.get(port).addTargetPoint(targetPoint);
+            }
+
+        }
+    }
+
     //按钮点击事件
     public void onClick(View view) {
-        //用完删除
-        Timer timer = new Timer();
 
         switch (view.getId()){
             case R.id.btn_off_on_system:
@@ -516,7 +618,7 @@ public class SecondActivity extends AppCompatActivity{
 
                     //向所有从平台发送
                     for (int i = 0; i < controlledCarNum; i++){
-                        myBinder.sendMessageBind(cmd, car_ports[i], mContext);
+                        myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
                     }
 
                     //清除上一次的数据
@@ -528,66 +630,22 @@ public class SecondActivity extends AppCompatActivity{
                     btn_detail.setVisibility(Button.INVISIBLE);
                     btn_save.setVisibility(Button.INVISIBLE);
 
-                    //用完删除
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            double x = Math.random() * 10 - 5;
-                            double y = Math.random() * 5 + 0.1;
-                            while (x == 0){
-                                x = Math.random() * 10 - 5;
-                            }
-                            Random random = new Random(1000001010 + System.currentTimeMillis());
-                            double target_x = random.nextDouble() * 10 - 5;
-                            while (target_x == 0){
-                                target_x = Math.random() * 10 - 5;
-                            }
-                            double target_y = random.nextDouble() * 5 + 0.1;
-                            int port = (int)(Math.random() * 3) + 1 + base_port;
-                            RealPoint realPoint = new RealPoint(port, x , y);
-                            TargetPoint targetPoint = new TargetPoint(target_x, target_y);
+                    //测试函数
+                    //test1();
 
-                            carListsHash.get(port).addRealPoint(realPoint);
-                            carListsHash.get(port).addTargetPoint(targetPoint);
-
-                            carErrorView.update(realPoint);
-                        }
-                    }, 10, 500);
                 } else{
                     btn_offOnSystem.setText("开启系统");
                     String cmd = STOPSYSTEM + " " + ENTER;
                     //向所有从平台发送
                     for (int i = 0; i < controlledCarNum; i++){
-                        myBinder.sendMessageBind(cmd, car_ports[i], mContext);
+                        myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
                     }
+
+                    //测试
+                    //test2();
 
                     btn_detail.setVisibility(Button.VISIBLE);
                     btn_save.setVisibility(Button.VISIBLE);
-
-                    //用完删除
-                    timer.cancel();
-                    Set<Integer> set = carListsHash.keySet();
-                    for (int i = 0; i < 1000; i++) {
-                        for (Integer port: set) {
-                            double x = Math.random() * 10 - 5;
-                            double y = Math.random() * 5 + 0.01;
-                            while (x == 0){
-                                x = Math.random() * 10 - 5;
-                            }
-                            Random random = new Random(i * 12345);
-                            double target_x = random.nextDouble() * 10 - 5;
-                            double target_y = random.nextDouble() * 5 + 0.01;
-                            while (target_x == 0){
-                                target_x = Math.random() * 10 - 5;
-                            }
-                            RealPoint realPoint = new RealPoint(port, x , y);
-                            TargetPoint targetPoint = new TargetPoint(target_x, target_y);
-
-                            carListsHash.get(port).addRealPoint(realPoint);
-                            carListsHash.get(port).addTargetPoint(targetPoint);
-                        }
-
-                    }
 
                 }
                 break;
@@ -597,7 +655,7 @@ public class SecondActivity extends AppCompatActivity{
                     String cmd = StOPEM + " " + ENTER;
                     //发送紧急停止的命令
                     for (int i = 0; i < controlledCarNum; i++){
-                        myBinder.sendMessageBind(cmd, i, mContext);
+                        myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
                     }
 
                     btn_offOnSystem.setText("开启系统");//按紧急停止指令之后, 自动关闭系统
@@ -655,7 +713,7 @@ public class SecondActivity extends AppCompatActivity{
     public boolean saveFile(String path){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss");
         Date date = new Date();
-        String fileName = dateFormat.format(date) + ".dat";
+        String fileName = dateFormat.format(date) + ".txt";
 
         File file = new File(path, fileName);
 
