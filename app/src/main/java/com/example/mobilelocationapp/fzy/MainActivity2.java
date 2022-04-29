@@ -33,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,22 +67,22 @@ public class MainActivity2 extends AppCompatActivity {
     private int ViewWidth;
     private int ViewHeight;
     LinearLayout linearLayout;
-    private final float textWidth = 3f;
+//    private final float textWidth = 3f;
     private MyDrawView myDrawView;
     private volatile MyService.MyBinder myBinder;
     private MyService myService;
     private Boolean myBound = false;
-    private Button btn_send;
-    private Button btn_create;
+//    private Button btn_send;
+//    private Button btn_create;
     private TextView txtIP;
-    private EditText edtShow;
-    private final StringBuffer stringBuffer = new StringBuffer();
+//    private EditText edtShow;
+//    private final StringBuffer stringBuffer = new StringBuffer();
     private final MyBroadcast myBroadcast = new MyBroadcast();
-    private List<Car> cars = new ArrayList<>();
+//    private final List<Car> cars = new ArrayList<>();
     private AppCompatSeekBar seekBar;
     private TextView speedTxt;
     private final LinkedList<String> formCars = new LinkedList<>();
-    private TextView formCar;
+//    private TextView formCar;
     private final String UP = "UP";
     private final String DOWN = "DOWN";
     private final String LEFT = "LEFT";
@@ -93,6 +94,7 @@ public class MainActivity2 extends AppCompatActivity {
     private final String StopFormation = "StopFormation\r\n";
     //当前选择的radio
     private int currRadio = 0;
+
     private RadioButton radio1;
     private RadioButton radio2;
     private RadioButton radio3;
@@ -104,6 +106,8 @@ public class MainActivity2 extends AppCompatActivity {
     private Button btnFineTurn;
     private ImageButton TLeft;
     private ImageButton TRight;
+    private TextView turnAngle;
+
     private String[] status = new String[4];
     //标志位
     private final int[] car_isChecked = new int[3];
@@ -115,6 +119,7 @@ public class MainActivity2 extends AppCompatActivity {
     private ImageButton btn_up, btn_down, btn_left, btn_right, RotateLeft, RotateRight;
     private final Handler handler = new Handler();
     private Runnable runnable1, runnable2;
+    private Context context;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -149,6 +154,8 @@ public class MainActivity2 extends AppCompatActivity {
         //获取布局文件里的linearlayout容器
         linearLayout.addView(myDrawView);
 
+        context = getApplicationContext();
+
 //        Button nextPage = findViewById(R.id.StartFormation);
         txtIP = findViewById(R.id.ip2);
         seekBar = findViewById(R.id.seekBar_speed);
@@ -171,6 +178,7 @@ public class MainActivity2 extends AppCompatActivity {
         btn_right = findViewById(R.id.ibtn_right);
         RotateLeft = findViewById(R.id.RotateLeft);
         RotateRight = findViewById(R.id.RotateRight);
+        turnAngle = findViewById(R.id.turn_angle2);
 
         //控制平板横向
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -233,37 +241,44 @@ public class MainActivity2 extends AppCompatActivity {
             return true;
         });
         btn_down.setOnTouchListener((view, motionEvent) -> {
-//                longPress = false;
             String down = DOWN + " " + acceleration + " " + speed + suffix;
             longTouchSendCmd(down, motionEvent);
             return true;
         });
 
         btn_left.setOnTouchListener((view, motionEvent) -> {
-//                longPress = false;
             String leftMsg = LEFT + " " + acceleration + " " + speed + suffix;
             longTouchSendCmd(leftMsg, motionEvent);
             return true;
         });
 
         btn_right.setOnTouchListener((view, motionEvent) -> {
-//                longPress = false;
             String rightMsg = RIGHT + " " + acceleration + " " + speed + suffix;
             longTouchSendCmd(rightMsg, motionEvent);
             return true;
         });
 
         RotateLeft.setOnTouchListener((view, motionEvent) -> {
-//                longPress = false;
             longTouchSendCmd(ROTATEL + speed + suffix, motionEvent);
             return true;
         });
 
         RotateRight.setOnTouchListener((view, motionEvent) -> {
-//                longPress = false;
             longTouchSendCmd(ROTATER + speed + suffix, motionEvent);
             return true;
         });
+
+        TLeft.setOnTouchListener(((view, motionEvent) -> {
+            String TLEFT = "TLEFT 1\r\n";
+            longTouchSendCmd(TLEFT, motionEvent);
+            return true;
+        }));
+
+        TRight.setOnTouchListener(((view, motionEvent) -> {
+            String TRIGHT = "TRIGHT 1\r\n";
+            longTouchSendCmd(TRIGHT, motionEvent);
+            return true;
+        }));
     }
 
     //处理发送信息
@@ -293,7 +308,9 @@ public class MainActivity2 extends AppCompatActivity {
                 handler.removeCallbacks(runnable1);
                 Log.e(TAG, "longTouchSendCmd: 松开" );
                 //发送停止指令
-                myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
+                if (!(sendMsg.equals("TLEFT 1\r\n") || sendMsg.equals("TRIGHT 1\r\n"))) {
+                    myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
+                }
             }
         }
     }
@@ -303,6 +320,10 @@ public class MainActivity2 extends AppCompatActivity {
         String startFormation = "StartFormation\r\n";
         myBinder.sendMessageBind(startFormation, currRadio, getApplicationContext());
         Intent intent = new Intent(MainActivity2.this, SecondActivity.class);
+        //发送小车选中信息
+        intent.putExtra("s1", car_isChecked[0]);
+        intent.putExtra("s2", car_isChecked[1]);
+        intent.putExtra("s3", car_isChecked[2]);
         startActivity(intent);
     }
 
@@ -312,28 +333,14 @@ public class MainActivity2 extends AppCompatActivity {
 
     public void fineTurn(View view) {
         if (btnFineTurn.getText().equals("关闭微调")) {
-            TLeft.setEnabled(false);
-            TRight.setEnabled(false);
             btnFineTurn.setText("开启微调");
             String stopFineTurn = "StopFineTurn\r\n";
             myBinder.sendMessageBind(stopFineTurn, currRadio, getApplicationContext());
         } else {
-            TLeft.setEnabled(true);
-            TRight.setEnabled(true);
             btnFineTurn.setText("关闭微调");
             String startFineTurn = "StartFineTurn\r\n";
             myBinder.sendMessageBind(startFineTurn, currRadio, getApplicationContext());
         }
-    }
-
-    public void sendTRight(View view) {
-        String TRIGHT = "TRIGHT 1\r\n";
-        myBinder.sendMessageBind(TRIGHT, currRadio, getApplicationContext());
-    }
-
-    public void sendTLeft(View view) {
-        String TLEFT = "TLEFT 1\r\n";
-        myBinder.sendMessageBind(TLEFT, currRadio, getApplicationContext());
     }
 
     //定时检测连接状态，更改ip地址
@@ -451,11 +458,11 @@ public class MainActivity2 extends AppCompatActivity {
                 if (checked) {
                     car_isChecked[0] = 1;
                     formCars.addFirst(car1);
-                    radio1.setEnabled(true);
+//                    radio1.setEnabled(true);
                 } else {
                     car_isChecked[0] = 0;
                     formCars.remove(car1);
-                    radio1.setEnabled(false);
+//                    radio1.setEnabled(false);
                     radio1.setChecked(false);
                     erasePoint(1102);
                 }
@@ -470,10 +477,10 @@ public class MainActivity2 extends AppCompatActivity {
                     } else {
                         formCars.add(car2);
                     }
-                    radio2.setEnabled(true);
+//                    radio2.setEnabled(true);
                     car_isChecked[1] = 1;
                 } else {
-                    radio2.setEnabled(false);
+//                    radio2.setEnabled(false);
                     radio2.setChecked(false);
                     formCars.remove(car2);
                     car_isChecked[1] = 0;
@@ -484,11 +491,11 @@ public class MainActivity2 extends AppCompatActivity {
             case R.id.checkbox3:
                 if (checked) {
                     formCars.addLast(car3);
-                    radio3.setEnabled(true);
+//                    radio3.setEnabled(true);
                     car_isChecked[2] = 1;
                 } else {
                     formCars.remove(car3);
-                    radio3.setEnabled(false);
+//                    radio3.setEnabled(false);
                     radio3.setChecked(false);
                     car_isChecked[2] = 0;
                     erasePoint(1104);
@@ -512,6 +519,7 @@ public class MainActivity2 extends AppCompatActivity {
                     currRadio = 0;
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
                     btnFineTurn.setEnabled(false);
+                    current.setText("未选择");
                 }
                 break;
             case R.id.radio1:
@@ -520,6 +528,7 @@ public class MainActivity2 extends AppCompatActivity {
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
                     current.setText("从车一");
                     btnFineTurn.setEnabled(true);
+                    btnFineTurn.setText("开启微调");
                 }
                 break;
             case R.id.radio2:
@@ -528,6 +537,7 @@ public class MainActivity2 extends AppCompatActivity {
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
                     current.setText("从车二");
                     btnFineTurn.setEnabled(true);
+                    btnFineTurn.setText("开启微调");
                 }
                 break;
             case R.id.radio3:
@@ -536,6 +546,7 @@ public class MainActivity2 extends AppCompatActivity {
                     Log.e(TAG, "onRadioButtonClicked: " + currRadio );
                     current.setText("从车三");
                     btnFineTurn.setEnabled(true);
+                    btnFineTurn.setText("开启微调");
                 }
                 break;
         }
@@ -551,6 +562,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     //设置广播
     private class MyBroadcast extends BroadcastReceiver {
+        @SuppressLint("SetTextI18n")
         @Override
         public synchronized void onReceive(Context context, Intent intent) {
             String mAction = intent.getAction();
@@ -558,15 +570,23 @@ public class MainActivity2 extends AppCompatActivity {
             if (mAction.equals("get1102") || mAction.equals("get1103") || mAction.equals("get1104")) {
                 String message = intent.getStringExtra("V_actual");
                 int port = intent.getIntExtra("port", -1);
+                float angle = intent.getIntExtra("Angle", 0);
+                String fineTurnStop = intent.getStringExtra("FineTurnStop");
 
-                //可以考虑一次画多个，一次性画点，目前是多次画点，中间易干扰
-                //每一秒读取一次数据
-//                if (car_isChecked[port - 1102] == 1) {
-//                    drawPoint(port, message);
-//                }
                 //先存数据,在复选框选中的时候，才在图上显示
                 if (car_isChecked[port - 1102] == 1) {
                     map.put(port, message);
+                }
+
+                //获取状态角度信息
+                if (currRadio == port - 1101) {
+                    turnAngle.setText(Float.toString(angle));
+                }
+
+                //设置微调关闭
+                if (fineTurnStop != null && currRadio == port - 1101) {
+                    btnFineTurn.setText("开启微调");
+                    Toast.makeText(context, "微调关闭", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -591,7 +611,7 @@ public class MainActivity2 extends AppCompatActivity {
                     }
                 }
 
-                //消除离线的点
+
 
                 handler.postDelayed(this, 1000);
             }
