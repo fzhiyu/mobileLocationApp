@@ -24,26 +24,27 @@ import java.util.Stack;
 
 public class TcpSlaveServer implements Runnable{
 
-    //设置服务器ip地址
-    String host = "10.112.248.255";
     //设置端口
-    private int port;
+    private final int port;
     boolean isOpen = false;
-    private Context context;
-    String Tag = "fzy";
-    InputThread inputThread;
-    BufferedReader br;
+    private final Context context;
+    private final String Tag = "fzy";
+    private InputThread inputThread;
+    private BufferedReader br;
     private PrintWriter printWriter;
-    ServerSocket serverSocket;
-    Socket socket;
+    private Socket socket;
     boolean flag = false;
     long currHeart = 0;
 
     public TcpSlaveServer(int port, Context context) {
-        this.host = host;
+        //设置服务器ip地址
         this.port = port;
         this.context = context;
         isOpen = true;
+    }
+
+    public InputThread getInputThread() {
+        return inputThread;
     }
 
     //获取连接状态
@@ -62,7 +63,7 @@ public class TcpSlaveServer implements Runnable{
     @Override
     public void run() {
         try {
-            serverSocket = new ServerSocket(port);
+            ServerSocket serverSocket = new ServerSocket(port);
             while (isOpen) {
                 socket = getSocket(serverSocket);
                 if(socket != null) {
@@ -80,7 +81,7 @@ public class TcpSlaveServer implements Runnable{
             return serverSocket.accept();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG, "更新状态");
+//            Log.e(TAG, "更新状态");
             return null;
         }
     }
@@ -123,7 +124,7 @@ public class TcpSlaveServer implements Runnable{
         }
 
         @Override
-        public synchronized void run() {
+        public void run() {
             process();
 
             try {
@@ -145,6 +146,7 @@ public class TcpSlaveServer implements Runnable{
                     str = br.readLine();
                 } catch (IOException e) {
                     flag = false;
+                    Log.e(TAG, "process: 客户端异常关闭，与服务端断开连接" );
                     try {
                         br.close();
 //                        flag = false;
@@ -160,6 +162,7 @@ public class TcpSlaveServer implements Runnable{
                 }
                 if (System.currentTimeMillis() - currHeart > 2500) {
                     flag = false;
+                    Log.e(TAG, "process: 超时2.5秒，与客户端断开连接" );
                 }
                 if (str != null && str.charAt(0) == 'V') {
                     Intent intent = new Intent();

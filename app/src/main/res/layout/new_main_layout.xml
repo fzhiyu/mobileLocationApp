@@ -170,30 +170,6 @@
                 </RadioGroup>
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/speedTxt1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/layout4"
-                android:text="速度：" />
-
-            <TextView
-                android:id="@+id/speedTxt2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/layout4"
-                android:layout_toEndOf="@+id/speedTxt1"
-                android:text="30 m/s" />
-
-            <androidx.appcompat.widget.AppCompatSeekBar
-                android:id="@+id/seekBar_speed"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/layout4"
-                android:layout_toEndOf="@+id/speedTxt2"
-                android:max="100"
-                android:progress="30" />
-
         </RelativeLayout>
 
         <com.google.android.material.divider.MaterialDivider
@@ -273,9 +249,9 @@
                     android:layout_below="@id/turn_angle1"
                     android:layout_marginTop="2dp"
                     android:layout_toEndOf="@+id/TLeft"
+                    android:enabled="false"
                     android:onClick="fineTurn"
-                    android:text="开启微调"
-                    android:enabled="false"/>
+                    android:text="开启微调" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/TRight"
@@ -306,36 +282,61 @@
                 android:textSize="30px"
                 android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/speedTxt1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_turn2"
+                android:text="速度：" />
+
+            <TextView
+                android:id="@+id/speedTxt2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_turn2"
+                android:layout_toEndOf="@+id/speedTxt1"
+                android:text="0.3 m/s" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBar_speed"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txt_turn2"
+                android:layout_toEndOf="@+id/speedTxt2"
+                android:max="100"
+                android:progress="30" />
+
             <RelativeLayout
                 android:id="@+id/wheel"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true">
 
                 <ImageButton
+                    android:id="@+id/RotateLeft"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_toStartOf="@+id/ibtn_up"
                     android:background="@color/white"
-                    android:onClick="sendRotateLeft"
                     android:src="@drawable/ic_baseline_rotate_left_24" />
 
                 <ImageButton
+                    android:id="@+id/RotateRight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:layout_toEndOf="@+id/ibtn_up"
                     android:background="@color/white"
-                    android:onClick="sendRotateRight"
                     android:src="@drawable/ic_baseline_rotate_right_24" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_stop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/ibtn_up"
                     android:layout_centerInParent="true"
                     android:background="@drawable/round_button"
                     android:onClick="sendStop"
@@ -346,7 +347,6 @@
                     android:id="@+id/ibtn_up"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@id/btn_stop"
                     android:layout_centerHorizontal="true"
                     android:background="@color/white"
                     app:srcCompat="@drawable/ic_up" />
@@ -365,7 +365,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/btn_stop"
+                    android:layout_toStartOf="@+id/btn_stop"
                     android:background="@color/white"
                     android:src="@drawable/ic_left" />
 
@@ -374,7 +374,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/btn_stop"
+                    android:layout_toEndOf="@+id/btn_stop"
                     android:background="@color/white"
                     android:src="@drawable/ic_right" />
             </RelativeLayout>

@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">mobileLocationApp</string>
-    <string name="keep_tapping">Keep tapping.</string>
+    <string name="app_name" translatable="false">"高精度定位跟踪"</string>
     <string name="done">Done!</string>
     <string name="stop">STOP</string>
     <integer name="layout_width">400</integer>
