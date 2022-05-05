@@ -570,8 +570,10 @@ public class MainActivity2 extends AppCompatActivity {
             if (mAction.equals("get1102") || mAction.equals("get1103") || mAction.equals("get1104")) {
                 String message = intent.getStringExtra("V_actual");
                 int port = intent.getIntExtra("port", -1);
-                float angle = intent.getIntExtra("Angle", 0);
+                String angle = intent.getStringExtra("Angle");
                 String fineTurnStop = intent.getStringExtra("FineTurnStop");
+
+                String[] messageData = angle.split(" ");
 
                 //先存数据,在复选框选中的时候，才在图上显示
                 if (car_isChecked[port - 1102] == 1) {
@@ -580,7 +582,7 @@ public class MainActivity2 extends AppCompatActivity {
 
                 //获取状态角度信息
                 if (currRadio == port - 1101) {
-                    turnAngle.setText(Float.toString(angle));
+                    turnAngle.setText(messageData[1]);
                 }
 
                 //设置微调关闭
