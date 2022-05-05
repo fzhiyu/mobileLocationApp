@@ -23,14 +23,14 @@
             android:exported="false" />
 
         <service
-            android:name=".fzy.MyService"
+            android:name=".First.MyService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
             android:name=".SecondActivity"
             android:exported="true"
-            android:parentActivityName=".fzy.MainActivity2" /> <!-- <activity -->
+            android:parentActivityName=".First.MainActivity2" /> <!-- <activity -->
         <!-- android:name=".serviceTest.MainActivity" -->
         <!-- android:exported="true" -->
         <!-- android:launchMode="singleTask"> -->
@@ -41,7 +41,7 @@
         <!-- </activity> -->
         <!-- <activity android:name=".serviceTest.MainActivity2"/> -->
         <activity
-            android:name=".fzy.MainActivity2"
+            android:name=".First.MainActivity2"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>

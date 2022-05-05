@@ -1,4 +1,4 @@
-package com.example.mobilelocationapp.fzy;
+package com.example.mobilelocationapp.First;
 
 import android.content.Context;
 import android.content.Intent;

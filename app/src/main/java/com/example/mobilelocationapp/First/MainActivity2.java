@@ -1,4 +1,4 @@
-package com.example.mobilelocationapp.fzy;
+package com.example.mobilelocationapp.First;
 
 import static android.content.ContentValues.TAG;
 
@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -44,7 +43,6 @@ import com.example.mobilelocationapp.SecondActivity;
 import com.example.mobilelocationapp.utils.CommendFun;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -119,7 +117,8 @@ public class MainActivity2 extends AppCompatActivity {
     private ImageButton btn_up, btn_down, btn_left, btn_right, RotateLeft, RotateRight;
     private final Handler handler = new Handler();
     private Runnable runnable1, runnable2;
-    private Context context;
+    //声明位图
+    private Bitmap bitmap;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -154,7 +153,7 @@ public class MainActivity2 extends AppCompatActivity {
         //获取布局文件里的linearlayout容器
         linearLayout.addView(myDrawView);
 
-        context = getApplicationContext();
+        Context context = getApplicationContext();
 
 //        Button nextPage = findViewById(R.id.StartFormation);
         txtIP = findViewById(R.id.ip2);
@@ -464,7 +463,7 @@ public class MainActivity2 extends AppCompatActivity {
                     formCars.remove(car1);
 //                    radio1.setEnabled(false);
                     radio1.setChecked(false);
-                    erasePoint(1102);
+//                    erasePoint(1102);
                 }
                 convertCar(formCars);
                 break;
@@ -484,7 +483,7 @@ public class MainActivity2 extends AppCompatActivity {
                     radio2.setChecked(false);
                     formCars.remove(car2);
                     car_isChecked[1] = 0;
-                    erasePoint(1103);
+//                    erasePoint(1103);
                 }
                 convertCar(formCars);
                 break;
@@ -498,7 +497,7 @@ public class MainActivity2 extends AppCompatActivity {
 //                    radio3.setEnabled(false);
                     radio3.setChecked(false);
                     car_isChecked[2] = 0;
-                    erasePoint(1104);
+//                    erasePoint(1104);
                 }
                 convertCar(formCars);
                 break;
@@ -570,8 +569,10 @@ public class MainActivity2 extends AppCompatActivity {
             if (mAction.equals("get1102") || mAction.equals("get1103") || mAction.equals("get1104")) {
                 String message = intent.getStringExtra("V_actual");
                 int port = intent.getIntExtra("port", -1);
-                float angle = intent.getIntExtra("Angle", 0);
+                String angle = intent.getStringExtra("Angle");
                 String fineTurnStop = intent.getStringExtra("FineTurnStop");
+
+                String[] messageData = angle.split(" ");
 
                 //先存数据,在复选框选中的时候，才在图上显示
                 if (car_isChecked[port - 1102] == 1) {
@@ -580,7 +581,7 @@ public class MainActivity2 extends AppCompatActivity {
 
                 //获取状态角度信息
                 if (currRadio == port - 1101) {
-                    turnAngle.setText(Float.toString(angle));
+                    turnAngle.setText(messageData[1]);
                 }
 
                 //设置微调关闭
@@ -598,20 +599,22 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public void run() {
                 //每一秒读取一次map, 画点，擦除点的时候，直接擦除整体
-                for (Map.Entry<Integer, Car> entry : carMap.entrySet()) {
-                    //每次画点之前，先整体擦除，再画点
-                    erasePoint(entry.getKey());
-//                    Log.e(TAG, "run: " + entry );
-                }
+//                for (Map.Entry<Integer, Car> entry : carMap.entrySet()) {
+//                    //每次画点之前，先整体擦除，再画点
+//                    erasePoint(entry.getKey());
+////                    Log.e(TAG, "run: " + entry );
+//                }
+                // 直接将位图全部填充为白色
+                bitmap.eraseColor(Color.WHITE);
 
                 for (Map.Entry<Integer, String> entry : map.entrySet()) {
                     //每次画点之前，先整体擦除，再画点
-                    if (status[entry.getKey() - 1101].equals("在线")) {
+                    int curr = entry.getKey() - 1101;
+                    //当在线，并且复选框选中时才显示
+                    if (status[curr].equals("在线") && car_isChecked[curr - 1] == 1) {
                         drawPoint(entry.getKey(), entry.getValue());
                     }
                 }
-
-
 
                 handler.postDelayed(this, 1000);
             }
@@ -673,8 +676,6 @@ public class MainActivity2 extends AppCompatActivity {
     public class MyDrawView extends View {
 
         Path path;
-        //声明位图
-        private final Bitmap bitmap;
 
         public MyDrawView(Context context, @Nullable AttributeSet attrs) {
             super(context, attrs);
@@ -769,6 +770,7 @@ public class MainActivity2 extends AppCompatActivity {
             paint.setTextSize(textSize);
             paint.setStyle(Paint.Style.FILL);
 //            canvas.drawText("1格 : 0.5米", ViewWidth -300, 400, paint);
+
             //画一
             canvas.drawText("主", circleX + 10, circleY + 30, paint);
 

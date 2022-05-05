@@ -1,6 +1,4 @@
-package com.example.mobilelocationapp.fzy;
-
-import static android.service.controls.ControlsProviderService.TAG;
+package com.example.mobilelocationapp.First;
 
 import android.app.Service;
 import android.content.Context;
@@ -12,8 +10,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

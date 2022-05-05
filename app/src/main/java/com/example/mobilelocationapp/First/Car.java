@@ -1,4 +1,4 @@
-package com.example.mobilelocationapp.fzy;
+package com.example.mobilelocationapp.First;
 
 public class Car {
     private float x;
