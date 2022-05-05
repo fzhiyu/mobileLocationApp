@@ -2,7 +2,6 @@ package com.example.mobilelocationapp;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -18,27 +17,26 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mobilelocationapp.chart.CarList;
-import com.example.mobilelocationapp.chart.ChartService;
+import com.example.mobilelocationapp.chart.MyLineChart;
 import com.example.mobilelocationapp.chart.RealPoint;
 import com.example.mobilelocationapp.chart.TargetPoint;
 import com.example.mobilelocationapp.fzy.MyService;
 import com.example.mobilelocationapp.utils.Tools;
-
-import org.achartengine.GraphicalView;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineDataSet;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,13 +47,19 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 public class SecondActivity extends AppCompatActivity{
+
+    public static final String TAG = "twoAct";
 
     public static final String ENTER = "\r\n";
     public static final String UP = "UP";
@@ -77,8 +81,7 @@ public class SecondActivity extends AppCompatActivity{
 
     public static final String CAR_LISTS = "carLists";
     private int controlledCarNum;
-    private CarList[] carLists;////误差数据
-    private List<Double> xList;
+    private HashMap<Integer, CarList> carListsHash = new HashMap<>();//误差数据
 
     //广播的action
     public static final String GET_1102 = "get1102";
@@ -89,12 +92,12 @@ public class SecondActivity extends AppCompatActivity{
 
     private RelativeLayout rLayout;
     private CarErrorView carErrorView;
-    private float m_to_dp = 50;//表示用多少dp代表一米
+    private float m_to_dp = CanvasView.m_to_dp;//表示用多少dp代表一米
 
     private SeekBar seekBar_up, seekBar_down, seekBar_time;//拖动条
     private TextView tv_up, tv_down, tv_time;
     private double up_acc = 1, down_acc = 1, speed = 1;//设置最大的限度
-    private double num_up_acc = up_acc / 2, num_down_acc = down_acc/ 2, num_speed = speed / 2;//初始的数值
+    private double num_up_acc = up_acc / 2, num_down_acc = down_acc / 2, num_speed = speed / 2;//初始的数值
 
     //控制台
     private Button btn_stop;
@@ -102,19 +105,23 @@ public class SecondActivity extends AppCompatActivity{
     private Boolean longPress;//表征是否在按压
 
     //按钮
-    private Button btn_offOnSystem, btn_stopEmergency, btn_detail;
+    private Button btn_offOnSystem, btn_stopEmergency, btn_detail, btn_save;
     private boolean isSystemOn = false;
 
-    private LinearLayout lLayout_X_Error, lLayout_Y_Error;//存放表格的线性布局
-    private GraphicalView XView, YView;//X，Y图表
-    private ChartService XService, YService;
+    //表格
+    private LineChart chart_x, chart_y;
+    private MyLineChart myLineChart_x, myLineChart_y;
 
     private Boolean myBound = false;
     private MyService.MyBinder myBinder;
     private MyService myService;//service实例, 可以调用service里的公共方法
     private ServiceConnection connection;
 
+    //广播
     private MyBroadcast myBroadcast = new MyBroadcast();
+
+    //测试
+    private Timer timer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +129,7 @@ public class SecondActivity extends AppCompatActivity{
 
         setContentView(R.layout.second_layout);
 
-        Log.e(TAG, "onCreate: " + "two");
+        Log.i(TAG, "onCreate: " + "two");
         //设置横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
@@ -134,16 +141,22 @@ public class SecondActivity extends AppCompatActivity{
 
         mContext = this;
 
+        //初始化视图
         initView();
 
+        //设置拖动条
         setSeekBar();
 
-        test();
+        //控制台长按事件
+        controlButton();
 
-        setChart();
+        //表格
+        setLineChart();
 
+        //小车
         setCar();
 
+        //设置广播
         setBoardCast();
 
         connection = new ServiceConnection() {
@@ -152,7 +165,6 @@ public class SecondActivity extends AppCompatActivity{
                 myBinder = (MyService.MyBinder) iBinder;
                 myService = myBinder.getService();
                 myBound = true;
-                //myService.getContext(mContext);//将上下文传递给service
                 Log.i(TAG, "two: 绑定" );
             }
             @Override
@@ -166,14 +178,30 @@ public class SecondActivity extends AppCompatActivity{
     }
 
     public void getCarPorts(){
+        Set<Integer> set = new TreeSet<>();
         Intent intent = getIntent();
-        car_ports = intent.getIntArrayExtra(CAR_Ports);
+        if (intent.getIntExtra("s1", -1) == 1){
+            set.add(1102);
+        }
+        if (intent.getIntExtra("s2", -1) == 1){
+            set.add(1103);
+        }
+        if (intent.getIntExtra("s3", -1) == 1){
+            set.add(1104);
+        }
+
+        int num = set.size();
+        car_ports = new int[num];
+        int j = 0;
+        for (Integer i: set) {
+            car_ports[j++] = i;
+        }
 
         if (car_ports != null){
             controlledCarNum = car_ports.length;
-            carLists = new CarList[controlledCarNum];
             for (int i = 0; i < controlledCarNum; i++) {
-                carLists[i] = new CarList(car_ports[i]);
+                Log.i(TAG, "getCarPorts: " + car_ports[i]);
+                carListsHash.put(car_ports[i], new CarList(car_ports[i]));
             }
         }
 
@@ -200,13 +228,16 @@ public class SecondActivity extends AppCompatActivity{
         btn_offOnSystem = findViewById(R.id.btn_off_on_system);
         btn_stopEmergency = findViewById(R.id.btn_stop_emergency);
         btn_detail = findViewById(R.id.btn_detail);
+        btn_save = findViewById(R.id.btn_save);
 
         //小车
         rLayout = findViewById(R.id.rLayout);
 
         //布局
-        lLayout_X_Error = findViewById(R.id.llayout_X_error);
-        lLayout_Y_Error = findViewById(R.id.llayout_Y_error);
+//        lLayout_X_Error = findViewById(R.id.llayout_X_error);
+//        lLayout_Y_Error = findViewById(R.id.llayout_Y_error);
+        chart_x = findViewById(R.id.chart_x);
+        chart_y = findViewById(R.id.chart_y);
     }
 
     //拖动
@@ -216,6 +247,7 @@ public class SecondActivity extends AppCompatActivity{
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 num_up_acc = i / 10.0 * up_acc;
                 tv_up.setText(num_up_acc + " m/s²");
+                Log.i(TAG, "onProgressChanged: up " + num_up_acc);
             }
 
             @Override
@@ -234,6 +266,7 @@ public class SecondActivity extends AppCompatActivity{
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 num_down_acc = i / 10.0 * down_acc;
                 tv_down.setText(num_down_acc + " m/s²");
+                Log.i(TAG, "onProgressChanged: down " + num_down_acc);
             }
 
             @Override
@@ -252,6 +285,7 @@ public class SecondActivity extends AppCompatActivity{
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 num_speed = i / 10.0 * speed;
                 tv_time.setText(num_speed + " m/s");
+                Log.i(TAG, "onProgressChanged: speed " + num_speed);
             }
 
             @Override
@@ -275,6 +309,7 @@ public class SecondActivity extends AppCompatActivity{
                 String cmd = StOP + " " + down_acc + ENTER;
                 // 发送停车指令
                 myBinder.sendMessageBind(cmd, 0, mContext);
+                Log.i(TAG, "controlButton: " + cmd);
             }
         });
 
@@ -335,7 +370,9 @@ public class SecondActivity extends AppCompatActivity{
                                 try {
                                     //发送开始指令
                                     myBinder.sendMessageBind(cmdPress, 0, mContext);
-                                    Thread.sleep(100);//每0.1s一次
+                                    Log.i(TAG, "controlButton " + cmdPress);
+                                    Thread.sleep(500);//每0.5s一次
+
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -352,81 +389,52 @@ public class SecondActivity extends AppCompatActivity{
                 longPress = false;
                 //发送停止指令
                 myBinder.sendMessageBind(cmdStopPress, 0, mContext);
+                Log.i(TAG, "controlButton " + cmdStopPress);
             }
         }
     }
 
-    //按钮点击事件
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.btn_off_on_system:
-                isSystemOn = !isSystemOn;
-                if (isSystemOn){
-                    btn_offOnSystem.setText("关闭系统");
-                    String cmd = STARTSYSTEM + " " + ENTER;
-                    //向所有从平台发送
-
-                    btn_detail.setVisibility(Button.GONE);
-                    //用完删除
-                    Toast.makeText(this, cmd, Toast.LENGTH_SHORT).show();
-                } else{
-                    btn_offOnSystem.setText("开启系统");
-                    String cmd = STOPSYSTEM + " " + ENTER;
-                    //向所有从平台发送
-
-                    if (carLists != null){
-                        for (int i = 0; i < carLists.length; i++) {
-                            if (carLists[i] != null && !carLists[i].isEmpty())
-                                btn_detail.setVisibility(Button.VISIBLE);
-                        }
-                    }
-                    //用完删除
-                    btn_detail.setVisibility(Button.VISIBLE);
-                    Toast.makeText(this, cmd, Toast.LENGTH_SHORT).show();
-
-                }
-                break;
-            case R.id.btn_stop_emergency:
-                //紧急停止
-                if (isSystemOn){ //平台开着
-                    String cmd = StOPEM + " " + ENTER;
-                    //发送紧急停止的命令
-
-                    btn_offOnSystem.setText("开启系统");//按紧急停止指令之后, 自动关闭系统
-                    isSystemOn = !isSystemOn;
-                }
-                break;
-
-            case R.id.btn_detail:
-                Intent intent = new Intent(this, ThirdActivity.class);
-                intent.putExtra(CAR_Ports, car_ports);
-                intent.putExtra(CAR_LISTS, carLists);
-                startActivity(intent);
-                break;
-        }
-    }
+//    private void longTouchSendCmd(final Activity activity, String cmdPress, String cmdStopPress, MotionEvent event){
+//
+//
+//        switch (event.getAction()){
+//            case MotionEvent.ACTION_DOWN:{
+//                longPress = true;
+//
+//                Handler handler = new Handler();
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (!longPress){
+//                            handler.removeCallbacks(this);
+//                        }
+//                        Log.e(TAG, "run: " + "send");
+//                        handler.postDelayed(this, 500);
+//                    }
+//
+//                };
+//                handler.postDelayed(runnable, 500);
+//                break;
+//            }
+//            case MotionEvent.ACTION_UP:{
+//                longPress = false;
+//                Log.e(TAG, ": " + "stop");
+//                break;
+//            }
+//        }
+//    }
 
     //初始化小车
     public void setCar(){
-        RealPoint[] cars = new RealPoint[3];
-        cars[0] = new RealPoint(base_port + 1, 8, 0);
-        cars[1] = new RealPoint(base_port + 2, 0, -4);
-        cars[2] = new RealPoint(base_port + 3, -4, 0);
+        RealPoint[] cars = new RealPoint[controlledCarNum];
+        for (int i = 0; i < controlledCarNum; i++) {
+            cars[i] = new RealPoint(car_ports[i], (i + 1) % 2 * Math.pow(-1, i / 2) * 4, (i % 2) * (4));
+        }
+//        cars[0] = new RealPoint(base_port + 1, 8, 0);
+//        cars[1] = new RealPoint(base_port + 2, 0, -4);
+//        cars[2] = new RealPoint(base_port + 3, -4, 0);
         carErrorView = new CarErrorView(this, null, cars);
         rLayout.addView(carErrorView);
-
-        //测试
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                double x = Math.random() * 5 + 1;
-                double y = Math.random() * 5 + 1;
-                int port = (int)(Math.random() * 3) + 1;
-                RealPoint realPoint = new RealPoint(port + base_port, x , y);
-                carErrorView.update(realPoint);
-            }
-        }, 10, 2000);
     }
 
     public void setBoardCast(){
@@ -453,39 +461,35 @@ public class SecondActivity extends AppCompatActivity{
 
                 //收到v类型的数据后, 更新小车位置, 将小车的真实位置存入carList
                 if (v_message != null && !v_message.equals("") && port != -1){
+                    Log.i(TAG, "onReceive: " + v_message);
 
                     String[] messageData = v_message.split(" ");
 
-                    double x = Integer.parseInt(messageData[1]);
-                    double y = Integer.parseInt(messageData[2]);
+                    double x = Double.parseDouble(messageData[1]);
+                    double y = Double.parseDouble(messageData[2]);
 
                     RealPoint realPoint = new RealPoint(port, x, y);
 
                     carErrorView.update(realPoint);//更新小车位置
 
                     if (isSystemOn){ //如果追踪系统开着, 将数据放入carList中
-                        for (int i = 0; i < carLists.length; i++) {
-                            if (carLists[i].getPort() == port){
-                                carLists[i].addRealPoint(realPoint);
-                            }
-                        }
+                        carListsHash.get(port).addRealPoint(realPoint);
                     }
                 }
 
                 //收到target类型的数据后, 将小车的理论位置存入carList
                 if (target_message != null && !target_message.equals("") && port != -1){
+                    Log.i(TAG, "onReceive: " + target_message);
                     if (isSystemOn){
                         String[] messageData = target_message.split(" ");
-                        double x = Integer.parseInt(messageData[1]);
-                        double y = Integer.parseInt(messageData[2]);
+                        double x = Double.parseDouble(messageData[1]);
+                        double y = Double.parseDouble(messageData[2]);
 
                         TargetPoint targetPoint = new TargetPoint(x, y);
 
-                        for (int i = 0; i < carLists.length; i++) {
-                            if (carLists[i].getPort() == port){
-                                carLists[i].addTargetPoint(targetPoint);
-                            }
-                        }
+                        //如果追踪系统开着, 将数据放入carList中
+                        carListsHash.get(port).addTargetPoint(targetPoint);
+
                     }
                 }
 
@@ -494,70 +498,190 @@ public class SecondActivity extends AppCompatActivity{
         }
     }
 
-    public void test(){
-        carLists = new CarList[2];
+    public void setLineChart(){
 
-        carLists[0] = new CarList(1102);
-        carLists[1] = new CarList(1103);
-
-        for (int i = 0; i < 10; i++) {
-            double x = Math.random() * 4 + 1;
-            Random random = new Random(1000000202);
-            double y = random.nextDouble();
+        myLineChart_x = new MyLineChart(chart_x, "x轴误差");
+        myLineChart_x.initLineChart();
 
 
-            carLists[0].addRealPoint(x, y);
-            carLists[0].addTargetPoint(x, y);
-
-            carLists[1].addRealPoint(x, y);
-            carLists[1].addTargetPoint(x, y);
-        }
-
-        xList = new ArrayList<>();
-        for (int i = 0; i < carLists[0].getXError().size(); i++) {
-            xList.add(i * 1.0);
-        }
-    }
-
-    public void setChart(){
-        //误差曲线
-        XService = new ChartService(this);
-        XService.setMultipleSeriesDataset("从车一实时误差");
-        XService.setMultipleSeriesRenderer(50, 5, "x轴实时误差", "时间", "误差",
-                Color.RED, Color.RED, Color.RED, Color.BLACK);
-        XView = XService.getGraphicalView();
-
-        YService = new ChartService(this);
-        YService.setMultipleSeriesDataset("Y轴实时误差");
-        YService.setMultipleSeriesRenderer(50, 5, "y轴实时误差", "时间", "误差",
-                Color.RED, Color.RED, Color.RED, Color.BLACK);
-        YView = YService.getGraphicalView();
-
-        lLayout_X_Error.addView(XView);
-        lLayout_Y_Error.addView(YView);
-
-//        XService.updateChart(xList, carLists[0].getXError());
-//        YService.updateChart(xList, carLists[0].getYError());
-
-//        timer = new Timer();
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                handler.sendMessage(handler.obtainMessage());
-//            }
-//        }, 10, 1000);
+        myLineChart_y = new MyLineChart(chart_y, "y轴误差");
+        myLineChart_y.initLineChart();
 
     }
 
-    private int t = 0;
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            XService.updateChart(t, Math.random() * 10 - 5);
-            YService.updateChart(t, Math.random() * 10 - 5);
-            t += 1;
+    public void showLine(){
+        Set<Integer> set = carListsHash.keySet();
+        for (Integer port: set) {
+            List<Entry> entryList_slave_x = new ArrayList<>();
+            List<Entry> entryList_slave_y = new ArrayList<>();
+
+            int color = Color.BLUE;
+            String carName = "从车一";
+            switch (port.intValue()){
+                case 1102:
+                    color = Color.BLUE;
+                    carName = "从车一";
+                    break;
+                case 1103:
+                    color = Color.RED;
+                    carName = "从车二";
+                    break;
+                case 1104:
+                    color = Color.GRAY;
+                    carName = "从车三";
+                    break;
+            }
+
+            int count_x = 0;
+            for (Double x_error: carListsHash.get(port).getXError()) {
+                count_x++;
+                Entry entry = new Entry(count_x, x_error.floatValue());
+                entryList_slave_x.add(entry);
+            }
+
+            int count_y = 0;
+            for (Double y_error: carListsHash.get(port).getXError()) {
+                count_y++;
+                Entry entry = new Entry(count_y, y_error.floatValue());
+                entryList_slave_y.add(entry);
+            }
+
+            myLineChart_x.createLine(entryList_slave_x, color, LineDataSet.Mode.CUBIC_BEZIER, carName);
+            myLineChart_y.createLine(entryList_slave_y, color, LineDataSet.Mode.CUBIC_BEZIER, carName);
         }
-    };
+    }
+
+    public void test1(){
+        //用完删除
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                double x = Math.random() * 10 - 5;
+                double y = Math.random() * 5 + 0.1;
+                while (x == 0){
+                    x = Math.random() * 10 - 5;
+                }
+                Random random = new Random(1000001010 + System.currentTimeMillis());
+                double target_x = random.nextDouble() * 10 - 5;
+                while (target_x == 0){
+                    target_x = Math.random() * 10 - 5;
+                }
+                double target_y = random.nextDouble() * 5 + 0.1;
+                int port = (int)(Math.random() * 3) + 1 + base_port;
+                RealPoint realPoint = new RealPoint(port, x , y);
+                TargetPoint targetPoint = new TargetPoint(target_x, target_y);
+
+                carListsHash.get(port).addRealPoint(realPoint);
+                carListsHash.get(port).addTargetPoint(targetPoint);
+
+                carErrorView.update(realPoint);
+            }
+        }, 10, 500);
+    }
+
+    public void test2(){
+        //用完删除
+        timer.cancel();
+        Set<Integer> set = carListsHash.keySet();
+        for (int i = 0; i < 1000; i++) {
+            for (Integer port: set) {
+                double x = Math.random() * 10 - 5;
+                double y = Math.random() * 5 + 0.01;
+                while (x == 0){
+                    x = Math.random() * 10 - 5;
+                }
+                Random random = new Random(i * 12345);
+                double target_x = random.nextDouble() * 10 - 5;
+                double target_y = random.nextDouble() * 5 + 0.01;
+                while (target_x == 0){
+                    target_x = Math.random() * 10 - 5;
+                }
+                RealPoint realPoint = new RealPoint(port, x , y);
+                TargetPoint targetPoint = new TargetPoint(target_x, target_y);
+
+                carListsHash.get(port).addRealPoint(realPoint);
+                carListsHash.get(port).addTargetPoint(targetPoint);
+            }
+
+        }
+    }
+
+    //按钮点击事件
+    public void onClick(View view) {
+
+        switch (view.getId()){
+            case R.id.btn_off_on_system:
+                isSystemOn = !isSystemOn;
+                if (isSystemOn){
+                    btn_offOnSystem.setText("关闭系统");
+                    String cmd = STARTSYSTEM + " " + ENTER;
+
+                    //向所有从平台发送
+                    for (int i = 0; i < controlledCarNum; i++){
+                        myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
+                    }
+
+                    //清除上一次的数据
+                    Set<Integer> set = carListsHash.keySet();
+                    for (Integer port: set) {
+                        carListsHash.get(port).clear();
+                    }
+
+                    btn_detail.setVisibility(Button.INVISIBLE);
+                    btn_save.setVisibility(Button.INVISIBLE);
+
+                    //测试函数
+                    //test1();
+
+                } else{
+                    btn_offOnSystem.setText("开启系统");
+                    String cmd = STOPSYSTEM + " " + ENTER;
+                    //向所有从平台发送
+                    for (int i = 0; i < controlledCarNum; i++){
+                        myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
+                    }
+
+                    //测试
+                    //test2();
+
+                    btn_detail.setVisibility(Button.VISIBLE);
+                    btn_save.setVisibility(Button.VISIBLE);
+
+                }
+                break;
+            case R.id.btn_stop_emergency:
+                //紧急停止
+                if (isSystemOn){ //平台开着
+                    String cmd = StOPEM + " " + ENTER;
+                    //发送紧急停止的命令
+                    for (int i = 0; i < controlledCarNum; i++){
+                        myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
+                    }
+
+                    btn_offOnSystem.setText("开启系统");//按紧急停止指令之后, 自动关闭系统
+                    isSystemOn = !isSystemOn;
+                }
+                break;
+
+            case R.id.btn_detail:
+
+                showLine();
+
+                break;
+
+            case R.id.btn_save:
+
+                //设置文件夹
+                String dirPath = setDir(SecondActivity.this);
+                //保存数据到本地
+                boolean b = saveFile(dirPath);
+
+                if (b){
+                    Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
 
     public String setDir(Activity activity){
         String path = "";
@@ -589,7 +713,7 @@ public class SecondActivity extends AppCompatActivity{
     public boolean saveFile(String path){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss");
         Date date = new Date();
-        String fileName = dateFormat.format(date) + ".dat";
+        String fileName = dateFormat.format(date) + ".txt";
 
         File file = new File(path, fileName);
 
@@ -598,11 +722,12 @@ public class SecondActivity extends AppCompatActivity{
                         new OutputStreamWriter(
                                 new FileOutputStream(file), "UTF-8"));
         ) {
-            for (int i = 0; i < carLists.length; i++) {
-                out.write(carLists[i].getPort() + "\r\n");
+            Set<Integer> set = carListsHash.keySet();
+            for (Integer port: set) {
+                out.write(port + "\r\n");
                 out.write("RealDate: ");
 
-                for (Iterator<RealPoint> iterator = carLists[i].getRealPointList().iterator(); iterator.hasNext(); ) {
+                for (Iterator<RealPoint> iterator = carListsHash.get(port).getRealPointList().iterator(); iterator.hasNext(); ) {
                     String s = iterator.next().toString();
                     out.write(s);
                     out.write(" ");
@@ -610,7 +735,7 @@ public class SecondActivity extends AppCompatActivity{
 
                 out.write("\r\n");
                 out.write("Target: ");
-                for (Iterator<TargetPoint> iterator = carLists[i].getTargetPointList().iterator(); iterator.hasNext(); ) {
+                for (Iterator<TargetPoint> iterator = carListsHash.get(port).getTargetPointList().iterator(); iterator.hasNext(); ) {
                     String s = iterator.next().toString();
                     out.write(s);
                     out.write(" ");
@@ -618,13 +743,13 @@ public class SecondActivity extends AppCompatActivity{
 
                 out.write("\r\n");
                 out.write("XError: ");
-                for (Double d: carLists[i].getXError()) {
+                for (Double d: carListsHash.get(port).getXError()) {
                     out.write(d + " ");
                 }
 
                 out.write("\r\n");
                 out.write("YError: ");
-                for (Double d: carLists[i].getYError()) {
+                for (Double d: carListsHash.get(port).getYError()) {
                     out.write(d + " ");
                 }
 
@@ -654,5 +779,14 @@ public class SecondActivity extends AppCompatActivity{
 
         //解除绑定
         unbindService(connection);
+
+        //回收表格
+        chart_x.clearAllViewportJobs();
+        chart_x.removeAllViewsInLayout();
+        chart_x.removeAllViews();
+
+        chart_y.clearAllViewportJobs();
+        chart_y.removeAllViewsInLayout();
+        chart_y.removeAllViews();
     }
 }

@@ -23,7 +23,7 @@ public class CarErrorView extends View {
     private Paint textPaint;//画文字
     private Context mContext;//上下文引用
 
-    private float m_to_dp = 50;//表示用多少dp代表一米
+    private float m_to_dp = CanvasView.m_to_dp;//表示用多少dp代表一米
     private int textSize = 20;//文字大小
     private float strokeWidth; //描边宽度
     private float radius = 20; //小车的半径
@@ -111,12 +111,10 @@ public class CarErrorView extends View {
         super.onDraw(canvas);
 
         canvas.drawCircle(ccX, ccY, radius, circlePaint);
-        Log.e("hejun", "onDraw: ");
         canvas.drawText("0", ccX, ccY - carNumberOffsetY, carNumberPaint);
 
         for (int i = 0; i < carsNumber; i++){
             drawCar(canvas, (float) (cars[i].getDistance() * m_to_dp), (float)cars[i].getAngle(), cars[i].getPort() - Base_port);
-            Log.i("hejun", "onDraw: " + cars[i].getAngle() + " :" + cars[i].getPort());
         }
 
     }
@@ -126,15 +124,13 @@ public class CarErrorView extends View {
         canvas.save();//锁定画布
 
         canvas.translate(ccX, ccY);//平移画布
-        canvas.rotate(angle);//旋转画布
+        canvas.rotate(180 - angle);//旋转画布, 使小车在x轴上
 
         //画圆,线,圆内的文字
         canvas.drawCircle(distance, 0, radius, circlePaint);
         canvas.drawLine(radius, 0, distance - radius, 0, linePaint);
         canvas.drawText(number + "", distance , - carNumberOffsetY, carNumberPaint);
 
-        //旋转,使X到达Y的位置,画文字
-        //canvas.rotate(90);
         canvas.drawText(distance / m_to_dp + "m", distance / 2, 0, textPaint);
 
         canvas.restore();//释放画布

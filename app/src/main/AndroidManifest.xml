@@ -18,9 +18,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileLocationApp"
         >
-        <activity
-            android:name=".ThirdActivity"
-            android:exported="false" />
 
         <service
             android:name=".fzy.MyService"

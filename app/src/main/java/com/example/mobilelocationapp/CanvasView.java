@@ -16,9 +16,10 @@ import androidx.annotation.Nullable;
 
 public class CanvasView extends View {
     private static final float STROKE_WIDTH = 1F / 256F; // 描边宽度
-    private static final String SCALE_RULER = "1m";//标度尺
 
+    private static final String SCALE_RULER = "1m";//标度尺
     public static float m_to_dp = 50;//表示用多少dp代表一米
+
     public static int paddingTop = 40;//距离顶部多少dp
 
     private Paint paint, textPaint;//画笔
