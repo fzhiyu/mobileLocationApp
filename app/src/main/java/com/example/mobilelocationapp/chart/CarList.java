@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class CarList implements Serializable {
     private ArrayList<RealPoint> realPointList = new ArrayList<>();
-    private ArrayList<TargetPoint> targetPointList = new ArrayList<>();
+    private double target_x = 0, target_y = 0;
 
     private int port;
 
@@ -21,10 +21,21 @@ public class CarList implements Serializable {
         return realPointList;
     }
 
-    public ArrayList<TargetPoint> getTargetPointList() {
-        return targetPointList;
+    public double getTarget_x() {
+        return target_x;
     }
 
+    public void setTarget_x(double target_x) {
+        this.target_x = target_x;
+    }
+
+    public double getTarget_y() {
+        return target_y;
+    }
+
+    public void setTarget_y(double target_y) {
+        this.target_y = target_y;
+    }
 
     public void addRealPoint(double x, double y){
         addRealPoint(new RealPoint(port, x, y));
@@ -34,24 +45,15 @@ public class CarList implements Serializable {
         realPointList.add(realPoint);
     }
 
-
-    public void addTargetPoint(double x, double y){
-        addTargetPoint(new TargetPoint(x, y));
-    }
-
-    public void addTargetPoint(TargetPoint targetPoint){
-        targetPointList.add(targetPoint);
-    }
-
     /**
      * 单位 cm
      * @return
      */
     public ArrayList<Double> getXError(){
         ArrayList<Double> xErrorList = new ArrayList<>();
-        int min = Math.min(realPointList.size(), targetPointList.size());
-        for (int i = 0; i < min; i++) {
-            double error_cm = (realPointList.get(i).getX() - targetPointList.get(i).getX()) * 100;//m转化为cm
+        int size = realPointList.size();
+        for (int i = 0; i < size; i++) {
+            double error_cm = (realPointList.get(i).getX() - target_x) * 100;//m转化为cm
             xErrorList.add(error_cm);
         }
         return xErrorList;
@@ -60,21 +62,22 @@ public class CarList implements Serializable {
 
     public ArrayList<Double> getYError(){
         ArrayList<Double> yErrorList = new ArrayList<>();
-        int min = Math.min(realPointList.size(), targetPointList.size());
-        for (int i = 0; i < min; i++) {
-            double error_cm = (realPointList.get(i).getY() - targetPointList.get(i).getY()) * 100;
+        int size = realPointList.size();
+        for (int i = 0; i < size; i++) {
+            double error_cm = (realPointList.get(i).getY() - target_y) * 100;
             yErrorList.add(error_cm);
         }
         return yErrorList;
     }
 
     public boolean isEmpty(){
-        return realPointList.isEmpty() || targetPointList.isEmpty();
+        return realPointList.isEmpty();
     }
 
     public void clear(){
         realPointList.clear();
-        targetPointList.clear();
+        target_x = 0;
+        target_y = 0;
     }
 
 }

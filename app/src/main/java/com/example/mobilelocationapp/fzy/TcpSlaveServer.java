@@ -16,6 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class TcpSlaveServer implements Runnable{
+    private String TAG = "slave";
 
     //设置端口
     private final int port;
@@ -137,6 +138,7 @@ public class TcpSlaveServer implements Runnable{
                 try {
                     socket.setSoTimeout(5000);
                     str = br.readLine();
+//                    Log.i(TAG, "process: " + str);
                 } catch (IOException e) {
                     flag = false;
                     Log.e(TAG, "process: 客户端异常关闭，与服务端断开连接" );
@@ -153,7 +155,7 @@ public class TcpSlaveServer implements Runnable{
                     //                    Log.e(TAG, "run: " + str );
                     inputThread.sendData("OK\r\n");
                 }
-                if (System.currentTimeMillis() - currHeart > 2500) {
+                if (System.currentTimeMillis() - currHeart > 4500) {
                     flag = false;
                     Log.e(TAG, "process: 超时2.5秒，与客户端断开连接" );
                 }
@@ -168,6 +170,7 @@ public class TcpSlaveServer implements Runnable{
 
                 //接收Angle消息
                 if (str != null && str.startsWith("Angle")) {
+                    Log.e(TAG, "process: angle" + str );
                     Intent intent = new Intent();
                     String action = "get" + port;
                     intent.setAction(action);
@@ -178,6 +181,7 @@ public class TcpSlaveServer implements Runnable{
 
                 //接收FineTurnStop信息
                 if (str != null && str.startsWith("FineTurnStop")) {
+                    Log.e(TAG, "process: fine" + str);
                     Intent intent = new Intent();
                     String action = "get" + port;
                     intent.setAction(action);

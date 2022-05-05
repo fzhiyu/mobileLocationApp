@@ -269,13 +269,13 @@ public class MainActivity2 extends AppCompatActivity {
         });
 
         TLeft.setOnTouchListener(((view, motionEvent) -> {
-            String TLEFT = "TLEFT 1\r\n";
+            String TLEFT = "TLEFT 10\r\n";
             longTouchSendCmd(TLEFT, motionEvent);
             return true;
         }));
 
         TRight.setOnTouchListener(((view, motionEvent) -> {
-            String TRIGHT = "TRIGHT 1\r\n";
+            String TRIGHT = "TRIGHT 10\r\n";
             longTouchSendCmd(TRIGHT, motionEvent);
             return true;
         }));
@@ -386,10 +386,10 @@ public class MainActivity2 extends AppCompatActivity {
                         txtCar4.setTextColor(Color.BLACK);
                     }
                 }
-                handler.postDelayed(this, 500);// 50ms后执行this，即runable
+                handler.postDelayed(this, 50);// 50ms后执行this，即runable
             }
         };
-        handler.postDelayed(runnable, 1100);// 打开定时器，50ms后执行runnable操作
+        handler.postDelayed(runnable, 500);// 打开定时器，50ms后执行runnable操作
     }
 
     @Override
@@ -573,16 +573,18 @@ public class MainActivity2 extends AppCompatActivity {
                 String angle = intent.getStringExtra("Angle");
                 String fineTurnStop = intent.getStringExtra("FineTurnStop");
 
-                String[] messageData = angle.split(" ");
+                if (angle != null) {
+                    String[] messageData = angle.split(" ");
+
+                    //获取状态角度信息
+                    if (currRadio == port - 1101) {
+                        turnAngle.setText(messageData[1]);
+                    }
+                }
 
                 //先存数据,在复选框选中的时候，才在图上显示
                 if (car_isChecked[port - 1102] == 1) {
                     map.put(port, message);
-                }
-
-                //获取状态角度信息
-                if (currRadio == port - 1101) {
-                    turnAngle.setText(messageData[1]);
                 }
 
                 //设置微调关闭

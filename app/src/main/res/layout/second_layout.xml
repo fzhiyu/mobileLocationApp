@@ -38,13 +38,13 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="60"
                     android:max="10"
-                    android:progress="5" />
+                    android:progress="1" />
                 <TextView
                     android:id="@+id/tv_up"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="0.5 m/s²"
+                    android:text="0.1 m/s²"
                     android:gravity="center"/>
 
             </LinearLayout>
@@ -71,7 +71,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="0.5 m/s"
+                    android:text="1.0 m/s"
                     android:gravity="center"/>
 
             </LinearLayout>
@@ -84,7 +84,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="减速减速度"
+                    android:text="减速加速度"
                     android:gravity="center"/>
                 <SeekBar
                     android:id="@+id/seekBar_down"
@@ -92,13 +92,13 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="60"
                     android:max="10"
-                    android:progress="5" />
+                    android:progress="1" />
                 <TextView
                     android:id="@+id/tv_down"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="0.5 m/s²"
+                    android:text="0.1 m/s²"
                     android:gravity="center"/>
 
             </LinearLayout>

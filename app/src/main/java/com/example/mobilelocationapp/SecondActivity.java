@@ -96,8 +96,8 @@ public class SecondActivity extends AppCompatActivity{
 
     private SeekBar seekBar_up, seekBar_down, seekBar_time;//拖动条
     private TextView tv_up, tv_down, tv_time;
-    private double up_acc = 1, down_acc = 1, speed = 1;//设置最大的限度
-    private double num_up_acc = up_acc / 2, num_down_acc = down_acc / 2, num_speed = speed / 2;//初始的数值
+    private double up_acc = 1, down_acc = 1, speed = 2;//设置最大的限度
+    private double num_up_acc = up_acc / 10, num_down_acc = down_acc / 10, num_speed = speed / 2;//初始的数值
 
     //控制台
     private Button btn_stop;
@@ -306,7 +306,7 @@ public class SecondActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
 
-                String cmd = StOP + " " + down_acc + ENTER;
+                String cmd = StOPEM + ENTER;
                 // 发送停车指令
                 myBinder.sendMessageBind(cmd, 0, mContext);
                 Log.i(TAG, "controlButton: " + cmd);
@@ -485,10 +485,9 @@ public class SecondActivity extends AppCompatActivity{
                         double x = Double.parseDouble(messageData[1]);
                         double y = Double.parseDouble(messageData[2]);
 
-                        TargetPoint targetPoint = new TargetPoint(x, y);
-
                         //如果追踪系统开着, 将数据放入carList中
-                        carListsHash.get(port).addTargetPoint(targetPoint);
+                        carListsHash.get(port).setTarget_x(x);
+                        carListsHash.get(port).setTarget_y(y);
 
                     }
                 }
@@ -551,60 +550,6 @@ public class SecondActivity extends AppCompatActivity{
         }
     }
 
-    public void test1(){
-        //用完删除
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                double x = Math.random() * 10 - 5;
-                double y = Math.random() * 5 + 0.1;
-                while (x == 0){
-                    x = Math.random() * 10 - 5;
-                }
-                Random random = new Random(1000001010 + System.currentTimeMillis());
-                double target_x = random.nextDouble() * 10 - 5;
-                while (target_x == 0){
-                    target_x = Math.random() * 10 - 5;
-                }
-                double target_y = random.nextDouble() * 5 + 0.1;
-                int port = (int)(Math.random() * 3) + 1 + base_port;
-                RealPoint realPoint = new RealPoint(port, x , y);
-                TargetPoint targetPoint = new TargetPoint(target_x, target_y);
-
-                carListsHash.get(port).addRealPoint(realPoint);
-                carListsHash.get(port).addTargetPoint(targetPoint);
-
-                carErrorView.update(realPoint);
-            }
-        }, 10, 500);
-    }
-
-    public void test2(){
-        //用完删除
-        timer.cancel();
-        Set<Integer> set = carListsHash.keySet();
-        for (int i = 0; i < 1000; i++) {
-            for (Integer port: set) {
-                double x = Math.random() * 10 - 5;
-                double y = Math.random() * 5 + 0.01;
-                while (x == 0){
-                    x = Math.random() * 10 - 5;
-                }
-                Random random = new Random(i * 12345);
-                double target_x = random.nextDouble() * 10 - 5;
-                double target_y = random.nextDouble() * 5 + 0.01;
-                while (target_x == 0){
-                    target_x = Math.random() * 10 - 5;
-                }
-                RealPoint realPoint = new RealPoint(port, x , y);
-                TargetPoint targetPoint = new TargetPoint(target_x, target_y);
-
-                carListsHash.get(port).addRealPoint(realPoint);
-                carListsHash.get(port).addTargetPoint(targetPoint);
-            }
-
-        }
-    }
 
     //按钮点击事件
     public void onClick(View view) {
@@ -614,11 +559,12 @@ public class SecondActivity extends AppCompatActivity{
                 isSystemOn = !isSystemOn;
                 if (isSystemOn){
                     btn_offOnSystem.setText("关闭系统");
-                    String cmd = STARTSYSTEM + " " + ENTER;
+                    String cmd = STARTSYSTEM + ENTER;
 
                     //向所有从平台发送
                     for (int i = 0; i < controlledCarNum; i++){
                         myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
+                        Log.i(TAG, "onClick: " + (car_ports[i] - base_port));
                     }
 
                     //清除上一次的数据
@@ -635,7 +581,7 @@ public class SecondActivity extends AppCompatActivity{
 
                 } else{
                     btn_offOnSystem.setText("开启系统");
-                    String cmd = STOPSYSTEM + " " + ENTER;
+                    String cmd = STOPSYSTEM + ENTER;
                     //向所有从平台发送
                     for (int i = 0; i < controlledCarNum; i++){
                         myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
@@ -651,16 +597,18 @@ public class SecondActivity extends AppCompatActivity{
                 break;
             case R.id.btn_stop_emergency:
                 //紧急停止
-                if (isSystemOn){ //平台开着
-                    String cmd = StOPEM + " " + ENTER;
-                    //发送紧急停止的命令
-                    for (int i = 0; i < controlledCarNum; i++){
-                        myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
-                    }
-
-                    btn_offOnSystem.setText("开启系统");//按紧急停止指令之后, 自动关闭系统
-                    isSystemOn = !isSystemOn;
+                String cmd = STOPCAR + ENTER;
+                //发送紧急停止的命令
+                for (int i = 0; i < controlledCarNum; i++) {
+                    myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
                 }
+                myBinder.sendMessageBind(cmd, 0, mContext);
+
+                btn_offOnSystem.setText("开启系统");//按紧急停止指令之后, 自动关闭系统
+                isSystemOn = false;
+
+                btn_detail.setVisibility(Button.VISIBLE);
+                btn_save.setVisibility(Button.VISIBLE);
                 break;
 
             case R.id.btn_detail:
@@ -734,12 +682,7 @@ public class SecondActivity extends AppCompatActivity{
                 }
 
                 out.write("\r\n");
-                out.write("Target: ");
-                for (Iterator<TargetPoint> iterator = carListsHash.get(port).getTargetPointList().iterator(); iterator.hasNext(); ) {
-                    String s = iterator.next().toString();
-                    out.write(s);
-                    out.write(" ");
-                }
+                out.write("Target: " + carListsHash.get(port).getTarget_x() + " " + carListsHash.get(port).getTarget_y());
 
                 out.write("\r\n");
                 out.write("XError: ");
@@ -771,6 +714,7 @@ public class SecondActivity extends AppCompatActivity{
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
         Log.e(TAG, "onDestroy: " + "two");
 

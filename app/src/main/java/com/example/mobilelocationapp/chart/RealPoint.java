@@ -33,9 +33,6 @@ public class RealPoint implements Serializable {
     public double getDistance(){
         double distance = Math.sqrt(x * x + y * y);
         //保留小数点后三位
-//        BigDecimal b = new BigDecimal(distance);
-//        distance = b.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
-//        return distance;
         return Tools.formatDecimal(distance, 3);
     }
 
