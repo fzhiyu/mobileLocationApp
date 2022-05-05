@@ -1,4 +1,4 @@
-package com.example.mobilelocationapp.First;
+package com.example.mobilelocationapp.fzy;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.example.mobilelocationapp.First;
+package com.example.mobilelocationapp.fzy;
 
 import static android.content.ContentValues.TAG;
 
