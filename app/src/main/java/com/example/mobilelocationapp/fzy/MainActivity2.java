@@ -308,7 +308,7 @@ public class MainActivity2 extends AppCompatActivity {
                 handler.removeCallbacks(runnable1);
                 Log.e(TAG, "longTouchSendCmd: 松开" );
                 //发送停止指令
-                if (!(sendMsg.equals("TLEFT 1\r\n") || sendMsg.equals("TRIGHT 1\r\n"))) {
+                if (!(sendMsg.equals("TLEFT 10\r\n") || sendMsg.equals("TRIGHT 10\r\n"))) {
                     myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
                 }
             }
@@ -386,10 +386,10 @@ public class MainActivity2 extends AppCompatActivity {
                         txtCar4.setTextColor(Color.BLACK);
                     }
                 }
-                handler.postDelayed(this, 500);// 50ms后执行this，即runable
+                handler.postDelayed(this, 50);// 50ms后执行this，即runable
             }
         };
-        handler.postDelayed(runnable, 1100);// 打开定时器，50ms后执行runnable操作
+        handler.postDelayed(runnable, 500);// 打开定时器，50ms后执行runnable操作
     }
 
     @Override

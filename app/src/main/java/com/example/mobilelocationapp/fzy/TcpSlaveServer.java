@@ -153,7 +153,7 @@ public class TcpSlaveServer implements Runnable{
                     //                    Log.e(TAG, "run: " + str );
                     inputThread.sendData("OK\r\n");
                 }
-                if (System.currentTimeMillis() - currHeart > 2500) {
+                if (System.currentTimeMillis() - currHeart > 8000) {
                     flag = false;
                     Log.e(TAG, "process: 超时2.5秒，与客户端断开连接" );
                 }
