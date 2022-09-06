@@ -132,13 +132,17 @@ public class TcpMasterServer implements Runnable{
                     e.printStackTrace();
                 }
 
+                if (str == null || str.length() == 0){
+                    continue;
+                }
+
                 if(str != null && str.equals("AT+CIPSTATUS")) {
                     currHeart = System.currentTimeMillis();
 //                        Log.e(TAG, "run: " + str );
                     inputThread.sendData("OK\r\n");
                 }
 
-                if (System.currentTimeMillis() - currHeart > 8000) {
+                if (System.currentTimeMillis() - currHeart > 20000) {
                     flag = false;
                     Log.e(TAG, "process: 超时8秒，与客户端断开连接" );
                 }

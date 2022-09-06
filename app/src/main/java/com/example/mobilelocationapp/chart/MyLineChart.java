@@ -30,6 +30,8 @@ public class MyLineChart {
 
     private LineData lineData = new LineData();//曲线集合的容器
 
+    private ArrayList<LineDataSet> dataSets = new ArrayList<>();
+
     public MyLineChart(LineChart lineChart, String chartName) {
         this.mLineChart = lineChart;
         this.chartName = chartName;
@@ -117,6 +119,7 @@ public class MyLineChart {
 
     public void createLine(List<Entry> entryList, int color, LineDataSet.Mode mode, String label){
         LineDataSet dataSet = new LineDataSet(entryList, label);//一条曲线数据
+        dataSets.add(dataSet);
 
         initLineDataSet(dataSet, color, mode);//设置曲线的属性
 
@@ -133,6 +136,20 @@ public class MyLineChart {
 
         //重绘
         mLineChart.invalidate();
+    }
+
+    public void clearLine(){
+        for (LineDataSet dataSet: dataSets) {
+            lineData.removeDataSet(dataSet);
+        }
+        //通知数据已经改变
+        lineData.notifyDataChanged();
+        mLineChart.notifyDataSetChanged();
+
+        //重绘
+        mLineChart.invalidate();
+
+        dataSets.clear();
     }
 
 }

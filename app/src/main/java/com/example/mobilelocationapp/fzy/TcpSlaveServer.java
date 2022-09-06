@@ -135,7 +135,7 @@ public class TcpSlaveServer implements Runnable{
             while (!socket.isClosed() && flag) {
                 String str = null;
                 try {
-                    socket.setSoTimeout(5000);
+                    socket.setSoTimeout(10000);
                     str = br.readLine();
                 } catch (IOException e) {
                     flag = false;
@@ -148,6 +148,10 @@ public class TcpSlaveServer implements Runnable{
                     }
                     e.printStackTrace();
                 }
+                if (str == null || str.length() == 0){
+                    continue;
+                }
+
                 if (str != null && str.equals("AT+CIPSTATUS")) {
                     currHeart = System.currentTimeMillis();
                     //                    Log.e(TAG, "run: " + str );
@@ -157,7 +161,7 @@ public class TcpSlaveServer implements Runnable{
                     flag = false;
                     Log.e(TAG, "process: 超时8秒，与客户端断开连接" );
                 }
-                if (str != null && str.charAt(0) == 'V') {
+                if (str != null && str.length() != 0 && str.charAt(0) == 'V') {
                     Intent intent = new Intent();
                     String action = "get" + port;
                     intent.setAction(action);
@@ -199,6 +203,7 @@ public class TcpSlaveServer implements Runnable{
                     }
                 }
             }
+            flag = false;
         }
     }
 

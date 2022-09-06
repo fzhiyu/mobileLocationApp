@@ -111,6 +111,7 @@ public class SecondActivity extends AppCompatActivity{
     //按钮
     private Button btn_offOnSystem, btn_stopEmergency, btn_detail, btn_save;
     private boolean isSystemOn = false;
+    private boolean isLineShow = false;
 
     //表格
     private LineChart chart_x, chart_y;
@@ -584,6 +585,9 @@ public class SecondActivity extends AppCompatActivity{
                     for (Integer port: set) {
                         carListsHash.get(port).clear();
                     }
+                    myLineChart_x.clearLine();
+                    myLineChart_y.clearLine();
+                    isLineShow = false;
 
                     btn_detail.setVisibility(Button.INVISIBLE);
                     btn_save.setVisibility(Button.INVISIBLE);
@@ -618,6 +622,14 @@ public class SecondActivity extends AppCompatActivity{
 
                 btn_offOnSystem.setText("开启系统");//按紧急停止指令之后, 自动关闭系统
                 isSystemOn = false;
+                //清除上一次的数据
+                Set<Integer> set = carListsHash.keySet();
+                for (Integer port: set) {
+                    carListsHash.get(port).clear();
+                }
+                myLineChart_x.clearLine();
+                myLineChart_y.clearLine();
+                isLineShow = false;
 
                 btn_detail.setVisibility(Button.VISIBLE);
                 btn_save.setVisibility(Button.VISIBLE);
@@ -625,7 +637,10 @@ public class SecondActivity extends AppCompatActivity{
 
             case R.id.btn_detail:
 
-                showLine();
+                if (!isLineShow){
+                    showLine();
+                    isLineShow = !isLineShow;
+                }
 
                 break;
 
