@@ -155,7 +155,7 @@ public class TcpSlaveServer implements Runnable{
                 }
                 if (System.currentTimeMillis() - currHeart > 8000) {
                     flag = false;
-                    Log.e(TAG, "process: 超时2.5秒，与客户端断开连接" );
+                    Log.e(TAG, "process: 超时8秒，与客户端断开连接" );
                 }
                 if (str != null && str.charAt(0) == 'V') {
                     Intent intent = new Intent();
