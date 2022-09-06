@@ -44,6 +44,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,8 +97,11 @@ public class SecondActivity extends AppCompatActivity{
 
     private SeekBar seekBar_up, seekBar_down, seekBar_time;//拖动条
     private TextView tv_up, tv_down, tv_time;
-    private double up_acc = 1, down_acc = 1, speed = 2;//设置最大的限度
-    private double num_up_acc = up_acc / 10, num_down_acc = down_acc / 10, num_speed = speed / 2;//初始的数值
+    private double up_acc = 0.2, down_acc = 0.2, speed = 2;//设置最大的限度
+    private double num_up_acc = up_acc / 100 * 10, num_down_acc = down_acc / 100 * 10, num_speed = speed / 1000 * 500;//初始的数值
+    private String str_num_up_acc = String.format("%.3f", num_up_acc);
+    private String str_num_down_acc = String.format("%.3f", num_down_acc);
+    private String str_num_speed = String.format("%.3f", num_speed);
 
     //控制台
     private Button btn_stop;
@@ -217,6 +221,10 @@ public class SecondActivity extends AppCompatActivity{
         tv_down = findViewById(R.id.tv_down);
         tv_time = findViewById(R.id.tv_time);
 
+        tv_up.setText(str_num_up_acc + " m/s²");
+        tv_down.setText(str_num_down_acc + " m/s²");
+        tv_time.setText(str_num_speed + " m/s");
+
         //控制器
         btn_stop = findViewById(R.id.btn_stop);
         ibtn_up = findViewById(R.id.ibtn_up);
@@ -245,9 +253,9 @@ public class SecondActivity extends AppCompatActivity{
         seekBar_up.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                num_up_acc = i / 10.0 * up_acc;
-                tv_up.setText(num_up_acc + " m/s²");
-                Log.i(TAG, "onProgressChanged: up " + num_up_acc);
+                num_up_acc = i / 100.0 * up_acc;
+                str_num_up_acc = String.format("%.3f", num_up_acc);
+                tv_up.setText(str_num_up_acc + " m/s²");
             }
 
             @Override
@@ -264,9 +272,9 @@ public class SecondActivity extends AppCompatActivity{
         seekBar_down.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                num_down_acc = i / 10.0 * down_acc;
-                tv_down.setText(num_down_acc + " m/s²");
-                Log.i(TAG, "onProgressChanged: down " + num_down_acc);
+                num_down_acc = i / 100.0 * down_acc;
+                str_num_down_acc = String.format("%.3f", num_down_acc);
+                tv_down.setText(str_num_down_acc + " m/s²");
             }
 
             @Override
@@ -283,9 +291,9 @@ public class SecondActivity extends AppCompatActivity{
         seekBar_time.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                num_speed = i / 10.0 * speed;
-                tv_time.setText(num_speed + " m/s");
-                Log.i(TAG, "onProgressChanged: speed " + num_speed);
+                num_speed = i / 1000.0 * speed;
+                str_num_speed = String.format("%.3f", num_speed);
+                tv_time.setText(str_num_speed + " m/s");
             }
 
             @Override
@@ -556,6 +564,10 @@ public class SecondActivity extends AppCompatActivity{
 
         switch (view.getId()){
             case R.id.btn_off_on_system:
+                if (controlledCarNum < 1){
+                    Toast.makeText(mContext, "请将从车加入编队", Toast.LENGTH_SHORT).show();
+                    break;
+                }
                 isSystemOn = !isSystemOn;
                 if (isSystemOn){
                     btn_offOnSystem.setText("关闭系统");
@@ -733,4 +745,6 @@ public class SecondActivity extends AppCompatActivity{
         chart_y.removeAllViewsInLayout();
         chart_y.removeAllViews();
     }
+
+
 }

@@ -16,95 +16,82 @@
         android:orientation="vertical">
 
         <!--    拖动条-->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:orientation="vertical"-->
+
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/text_1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="20"
-                    android:text="加速加速度"
-                    android:gravity="center"/>
-                <SeekBar
-                    android:id="@+id/seekBar_up"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="60"
-                    android:max="10"
-                    android:progress="1" />
+                    android:text="加速加速度: " />
                 <TextView
                     android:id="@+id/tv_up"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="20"
-                    android:text="0.1 m/s²"
-                    android:gravity="center"/>
-
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
-
-            <LinearLayout
+            <SeekBar
+                android:id="@+id/seekBar_up"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/text_1"
+                android:max="100"
+                android:progress="10" />
+
+            <LinearLayout
+                android:id="@+id/text_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/seekBar_up"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="20"
-                    android:text="车最大速度"
-                    android:gravity="center"/>
-                <SeekBar
-                    android:id="@+id/seekBar_time"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="60"
-                    android:max="10"
-                    android:progress="5" />
+                    android:text="车最大速度: " />
                 <TextView
                     android:id="@+id/tv_time"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="20"
-                    android:text="1.0 m/s"
-                    android:gravity="center"/>
-
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
-
-            <LinearLayout
+            <SeekBar
+                android:id="@+id/seekBar_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/text_2"
+                android:max="1000"
+                android:progress="500" />
+
+            <LinearLayout
+                android:id="@+id/text_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/seekBar_time"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="20"
-                    android:text="减速加速度"
-                    android:gravity="center"/>
-                <SeekBar
-                    android:id="@+id/seekBar_down"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="60"
-                    android:max="10"
-                    android:progress="1" />
+                    android:text="减速加速度: " />
                 <TextView
                     android:id="@+id/tv_down"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="20"
-                    android:text="0.1 m/s²"
-                    android:gravity="center"/>
-
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
-
-
-        </LinearLayout>
+            <SeekBar
+                android:id="@+id/seekBar_down"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_3"
+                android:max="100"
+                android:progress="10" />
+        </RelativeLayout>
 
         <!--    控制台-->
         <LinearLayout

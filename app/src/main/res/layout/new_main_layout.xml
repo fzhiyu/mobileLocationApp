@@ -298,7 +298,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/speedTxt1"
                 android:max="1000"
-                android:progress="30"/>
+                android:progress="300" />
 
             <RelativeLayout
                 android:id="@+id/wheel"

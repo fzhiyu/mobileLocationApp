@@ -112,7 +112,7 @@ public class MainActivity2 extends AppCompatActivity {
     private String[] status = new String[4];
     //标志位
     private final int[] car_isChecked = new int[3];
-    private float speed = 0.30f;
+    private float speed = 0.300f;
     private Paint paint2;
     private final Map<Integer, String> map = new HashMap<>();
     private final Map<Integer, Car> carMap = new HashMap<>();
@@ -186,7 +186,8 @@ public class MainActivity2 extends AppCompatActivity {
         //控制平板横向
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         //设置速度
-        speedTxt.setText(speed + "m/s");
+//        speedTxt.setText(speed + "m/s");
+        speedTxt.setText(String.format("%.3f m/s", speed));
 
         //获取view的长宽
         ViewTreeObserver observer = linearLayout.getViewTreeObserver();
@@ -239,35 +240,35 @@ public class MainActivity2 extends AppCompatActivity {
     private void setButton() {
 
         btn_up.setOnTouchListener((view, motionEvent) -> {
-            String up = UP + " " + acceleration + " " + speed + suffix;
+            String up = UP + " " + acceleration + " " + String.format("%.3f", speed) + suffix;
             longTouchSendCmd(up, motionEvent);
             return true;
         });
         btn_down.setOnTouchListener((view, motionEvent) -> {
-            String down = DOWN + " " + acceleration + " " + speed + suffix;
+            String down = DOWN + " " + acceleration + " " + String.format("%.3f", speed) + suffix;
             longTouchSendCmd(down, motionEvent);
             return true;
         });
 
         btn_left.setOnTouchListener((view, motionEvent) -> {
-            String leftMsg = LEFT + " " + acceleration + " " + speed + suffix;
+            String leftMsg = LEFT + " " + acceleration + " " + String.format("%.3f", speed) + suffix;
             longTouchSendCmd(leftMsg, motionEvent);
             return true;
         });
 
         btn_right.setOnTouchListener((view, motionEvent) -> {
-            String rightMsg = RIGHT + " " + acceleration + " " + speed + suffix;
+            String rightMsg = RIGHT + " " + acceleration + " " + String.format("%.3f", speed) + suffix;
             longTouchSendCmd(rightMsg, motionEvent);
             return true;
         });
 
         RotateLeft.setOnTouchListener((view, motionEvent) -> {
-            longTouchSendCmd(ROTATEL + speed + suffix, motionEvent);
+            longTouchSendCmd(ROTATEL + String.format("%.3f", speed) + suffix, motionEvent);
             return true;
         });
 
         RotateRight.setOnTouchListener((view, motionEvent) -> {
-            longTouchSendCmd(ROTATER + speed + suffix, motionEvent);
+            longTouchSendCmd(ROTATER + String.format("%.3f", speed) + suffix, motionEvent);
             return true;
         });
 
@@ -415,7 +416,7 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 speed = (float) i / 1000;
-                speedTxt.setText(String.format("%.2f m/s", speed));
+                speedTxt.setText(String.format("%.3f m/s", speed));
             }
 
             @Override
