@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.AppCompatSeekBar;
 
 import com.example.mobilelocationapp.R;
@@ -127,6 +128,8 @@ public class MainActivity2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.new_main_layout);
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         init();
 
@@ -408,11 +411,11 @@ public class MainActivity2 extends AppCompatActivity {
     //处理速度滑条
     private void controlSpeed() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @SuppressLint("SetTextI18n")
+            @SuppressLint({"SetTextI18n", "DefaultLocale"})
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                speed = (float) i / 100;
-                speedTxt.setText(speed + " m/s");
+                speed = (float) i / 1000;
+                speedTxt.setText(String.format("%.2f m/s", speed));
             }
 
             @Override

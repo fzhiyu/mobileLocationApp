@@ -294,12 +294,11 @@
 
             <androidx.appcompat.widget.AppCompatSeekBar
                 android:id="@+id/seekBar_speed"
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/txt_turn2"
-                android:layout_toEndOf="@+id/speedTxt2"
-                android:max="100"
-                android:progress="30" />
+                android:layout_below="@id/speedTxt1"
+                android:max="1000"
+                android:progress="30"/>
 
             <RelativeLayout
                 android:id="@+id/wheel"
