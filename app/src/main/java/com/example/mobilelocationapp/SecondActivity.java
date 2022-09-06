@@ -97,7 +97,7 @@ public class SecondActivity extends AppCompatActivity{
 
     private SeekBar seekBar_up, seekBar_down, seekBar_time;//拖动条
     private TextView tv_up, tv_down, tv_time;
-    private double up_acc = 0.2, down_acc = 0.2, speed = 2;//设置最大的限度
+    private double up_acc = 0.2, down_acc = 0.2, speed = 1;//设置最大的限度
     private double num_up_acc = up_acc / 100 * 10, num_down_acc = down_acc / 100 * 10, num_speed = speed / 1000 * 500;//初始的数值
     private String str_num_up_acc = String.format("%.3f", num_up_acc);
     private String str_num_down_acc = String.format("%.3f", num_down_acc);
