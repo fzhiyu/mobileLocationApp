@@ -308,7 +308,7 @@ public class MainActivity2 extends AppCompatActivity {
                 handler.removeCallbacks(runnable1);
                 Log.e(TAG, "longTouchSendCmd: 松开" );
                 //发送停止指令
-                if (!(sendMsg.equals("TLEFT 1\r\n") || sendMsg.equals("TRIGHT 1\r\n"))) {
+                if (!(sendMsg.equals("TLEFT 10\r\n") || sendMsg.equals("TRIGHT 10\r\n"))) {
                     myBinder.sendMessageBind(STOP, currRadio, getApplicationContext());
                 }
             }
