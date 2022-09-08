@@ -98,7 +98,7 @@ public class SecondActivity extends AppCompatActivity{
     private SeekBar seekBar_up, seekBar_down, seekBar_time;//拖动条
     private TextView tv_up, tv_down, tv_time;
     private double up_acc = 0.2, down_acc = 0.2, speed = 1;//设置最大的限度
-    private double num_up_acc = up_acc / 100 * 10, num_down_acc = down_acc / 100 * 10, num_speed = speed / 1000 * 500;//初始的数值
+    private double num_up_acc = up_acc / 100 * 50, num_down_acc = down_acc / 100 * 50, num_speed = speed / 1000 * 300;//初始的数值
     private String str_num_up_acc = String.format("%.3f", num_up_acc);
     private String str_num_down_acc = String.format("%.3f", num_down_acc);
     private String str_num_speed = String.format("%.3f", num_speed);
@@ -535,7 +535,7 @@ public class SecondActivity extends AppCompatActivity{
                     carName = "从车二";
                     break;
                 case 1104:
-                    color = Color.GRAY;
+                    color = Color.GREEN;
                     carName = "从车三";
                     break;
             }
@@ -548,7 +548,7 @@ public class SecondActivity extends AppCompatActivity{
             }
 
             int count_y = 0;
-            for (Double y_error: carListsHash.get(port).getXError()) {
+            for (Double y_error: carListsHash.get(port).getYError()) {
                 count_y++;
                 Entry entry = new Entry(count_y, y_error.floatValue());
                 entryList_slave_y.add(entry);
@@ -618,18 +618,10 @@ public class SecondActivity extends AppCompatActivity{
                 for (int i = 0; i < controlledCarNum; i++) {
                     myBinder.sendMessageBind(cmd, car_ports[i] - base_port, mContext);
                 }
-                myBinder.sendMessageBind(cmd, 0, mContext);
+                myBinder.sendMessageBind(StOPEM + ENTER, 0, mContext);
 
                 btn_offOnSystem.setText("开启系统");//按紧急停止指令之后, 自动关闭系统
                 isSystemOn = false;
-                //清除上一次的数据
-                Set<Integer> set = carListsHash.keySet();
-                for (Integer port: set) {
-                    carListsHash.get(port).clear();
-                }
-                myLineChart_x.clearLine();
-                myLineChart_y.clearLine();
-                isLineShow = false;
 
                 btn_detail.setVisibility(Button.VISIBLE);
                 btn_save.setVisibility(Button.VISIBLE);
